@@ -214,7 +214,7 @@ the ledger checks storage from a process that did not write it.
                                                                       ▼
                                               ┌──────────────────────────┐
                                               │ LogParser.parse()        │
-                                              │  ├ 54 detectors          │
+                                              │  ├ 61 detectors          │
                                               │  └ generic_fallback      │
                                               └────────────┬─────────────┘
                                                            ▼
@@ -333,7 +333,7 @@ Measured on a format that exists nowhere in the codebase:
 
 | | |
 |---|---|
-| Before | 4/4 lines unclaimed by all 54 detectors |
+| Before | 4/4 lines unclaimed by every registered detector (54 at the time of measurement) |
 | Synthesis | **3 ms**, confidence 0.67, **no TODO in the output** |
 | After | 4/4 parsed with **zero human edits** — hostname, ISO timestamp, 10 attributes |
 
