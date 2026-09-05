@@ -77,7 +77,7 @@ second one is what counts.
 
 | | |
 |---|---|
-| **54 parsers** | Cisco ASA, FortiGate, Palo Alto (CEF), Check Point (LEEF), Snort, F5 BIG-IP, pfSense, Squid, Linux syslog, Windows Security, VMware (ESXi/NSX/vCenter/vROps/Horizon), Kubernetes, Envoy, CoreDNS, PostgreSQL, AWS CloudTrail, Azure, GCP, CrowdStrike, Defender, Okta, Duo, logfmt, JVM, Apache, IoT gateways |
+| **61 parsers** | Cisco ASA, FortiGate, Palo Alto (CEF), Check Point (LEEF), Snort, F5 BIG-IP, pfSense, Squid, Linux syslog, Windows Security, VMware (ESXi/NSX/vCenter/vROps/Horizon), Kubernetes, Envoy, CoreDNS, PostgreSQL, AWS CloudTrail, Azure, GCP, CrowdStrike, Defender, Okta, Duo, logfmt, JVM, Apache, IoT gateways |
 | **Structural fallback** | An unknown vendor still yields hostname, process, severity and key=value fields — and is never dropped |
 | **Parser synthesis** | Points at unmatched lines and writes a working parser in ~3 ms |
 | **28-field schema** | 18 required, 0 violations on live data; ECS and OCSF 1.3.0 exports |
@@ -97,6 +97,7 @@ It is pure Python standard library. On a bare Python 3.10+:
 cd app/backend/ingestion_pipeline
 python -m batch.test_custom_formats      # 50 checks — do detectors extract the right FIELDS
 python -m batch.test_source_coverage     # 61 + 84 checks — coverage, formats, OCSF, ordering
+python -m batch.test_unseen_vendors      # 28 vendors that appear in NO fixture
 ```
 
 ### The whole system
@@ -170,6 +171,16 @@ our own parser**:
    FortiGate traffic logs (Fortinet also emits `msg=`), and the suite **stayed
    green** because it only asserted that *a* detector matched. Now 10 attribution
    cases pin which detector must claim which format.
+
+5. **Our own fixtures were flattering us.** `sample_logs.txt` was written for
+   this parser, so testing against it proved the two agreed — not that the
+   parser handled the world. Re-testing with **28 vendors that appear nowhere
+   in the repository** (Juniper, SonicWall, Sophos, Zeek, Cloudflare, Zscaler,
+   SentinelOne, SailPoint, nginx, HAProxy, Redis, MongoDB, MySQL, Tomcat,
+   Veeam, BACnet, Zigbee…) dropped coverage from 97% to **75%**. Worse,
+   **RFC 5424 — a standard the problem statement names — was parsed wrong**:
+   `pri_syslog` read the version digit as the hostname. Seven detectors later
+   it is 28/28. `python -m batch.test_unseen_vendors` keeps it honest.
 
 The tool that demonstrates the system also audits it, and the tests grew from
 real defects rather than from imagination.

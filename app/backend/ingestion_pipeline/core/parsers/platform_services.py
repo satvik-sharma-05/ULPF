@@ -282,7 +282,12 @@ _RE_APP_LOGGER = re.compile(
     r'(?:Z|[+-]\d{2}:?\d{2})?)\s+'
     r'(?P<level>TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL)\s+'
     r'\[(?P<thread>[^\]]+)\]\s+'
-    r'(?P<logger>[\w$]+(?:\.[\w$]+)*)\s+-\s+(?P<msg>.*)$'
+    # Tomcat and other containers abbreviate the logger and embed the
+    # context path: `o.a.c.c.C.[.[.[/api]`. Brackets and slashes have to
+    # be allowed or every Tomcat line falls through. Still anchored by
+    # the bracketed thread and the ` - ` separator, so widening the
+    # logger charset does not make this match arbitrary prose.
+    r'(?P<logger>[\w$\[\]/.]+)\s+-\s+(?P<msg>.*)$'
 )
 
 

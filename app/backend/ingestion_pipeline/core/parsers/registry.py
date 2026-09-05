@@ -30,6 +30,9 @@ from .esxi import (
     detect_vcenter_server,
     detect_vmkernel,
 )
+from .common_formats import (detect_bracket_level_app, detect_mysql_error,
+                             detect_redis, detect_rfc5424, detect_sophos_kv,
+                             detect_web_access, detect_zeek_conn)
 from .logfmt import detect_logfmt
 from .linux_syslog import detect_appliance_placeholder_syslog, detect_rfc3164_wrapper
 from .cloud import (detect_aws_cloudtrail, detect_azure_activity,
@@ -109,11 +112,16 @@ DETECTORS = [
     ('k8s_access', detect_k8s_access),
     ('postgres_log', detect_postgres_log),
     ('postgres_native_log', detect_postgres_native_log),
+    ('web_access', detect_web_access),
+    ('mysql_error', detect_mysql_error),
+    ('redis', detect_redis),
+    ('zeek_conn', detect_zeek_conn),
     ('apache_combined_bracket_first', detect_apache_combined_bracket_first),
     ('bare_level_logger_log', detect_bare_level_logger_log),
     # Broad by design - the stock Logback/Log4j2 layout - so it sits
     # below every application detector that knows its own product.
     ('app_logger', detect_app_logger),
+    ('bracket_level_app', detect_bracket_level_app),
     ('deployment_health_log', detect_deployment_health_log),
     ('rfc3164_wrapper', detect_rfc3164_wrapper),
     # Cloud audit records. Placed early: each is identified by a field
@@ -130,6 +138,11 @@ DETECTORS = [
     ('defender_alert', detect_defender_alert),
     # Perimeter appliances, last: both match a broad shape, so every
     # platform-specific detector above keeps first refusal.
+    # BEFORE pri_syslog: that detector matches an RFC 5424 line too, and
+    # reads the version digit as the hostname. Ordering is the fix.
+    ('rfc5424', detect_rfc5424),
+    # Self-identifying key=value appliance bags, before the broader ones.
+    ('sophos_kv', detect_sophos_kv),
     ('fortinet_kv', detect_fortinet_kv),
     # AFTER fortinet_kv, not before. Both match key=value lines and
     # Fortinet also emits a `msg=` field, so logfmt placed first claimed
