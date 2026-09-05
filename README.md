@@ -7,7 +7,7 @@ the original, and with a hash chain that proves it was never altered afterwards.
 
 ```
 firewall syslog ─┐
-Okta JSON        ├─►  54 parsers  ─►  28-field schema  ─►  Neo4j  ─►  search · export · alert
+Okta JSON        ├─►  61 parsers  ─►  28-field schema  ─►  Neo4j  ─►  search · export · alert
 Windows XML      │         │              │                  │
 CEF / LEEF       │         │              │                  └─►  Merkle ledger
 containerd       ┘         │              └─►  raw bytes + SHA-256 on every event
@@ -154,8 +154,9 @@ usually a bug it caught.
 
 ### The part we are most pleased with
 
-We built **Parser Lab** to demonstrate the parser. It found **four real bugs in
-our own parser**:
+We built **Parser Lab** to demonstrate the parser, and then tested the parser
+against vendors it had never seen. Between them they found **five real bugs in
+our own work** — the last one in the tests themselves:
 
 1. **`reassemble()` didn't know half the formats we parse.** CEF, LEEF, JSON and
    PRI-prefixed syslog were not recognised as record *starts*, so on a mixed
@@ -440,7 +441,7 @@ from core.parsers.registry import DETECTORS; print('detectors:', len(DETECTORS))
 ```
 ```
 no network: OSError
-detectors: 54
+detectors: 61
 ```
 
 ---
@@ -455,7 +456,7 @@ sample_logs.{txt,xml,csv}      synthetic logs covering every source category and
 app/
   backend/
     ingestion_pipeline/        parsers, schema, synthesis  ← start here
-      core/parsers/            the 54 detectors
+      core/parsers/            the 61 detectors
       core/parser.py           normalisation, raw preservation, id + hash
       core/parser_synth.py     writes a parser from samples
       core/parser_semantics.py infers what a synthesised field MEANS
