@@ -1,0 +1,17 @@
+# Pinned, not floated. The air-gapped handover ships built images whose
+# versions are frozen; leaving `>=` here meant a rebuild produced a
+# different system from the one that was tested. Every version below was
+# read out of the built image with importlib.metadata on 2026-09-04,
+# not chosen from a changelog.
+# ============================================================================
+# ANALYTICS PIPELINE
+# Standalone: needs only a Neo4j instance the ingestion pipeline has
+# populated, and it only ever reads from it. No LLM, no embedding model, no
+# torch - every insight here is a rule computed directly from Cypher
+# aggregates, so this image stays small and starts in seconds.
+# ============================================================================
+
+neo4j==6.3.0
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+python-dotenv==1.2.3

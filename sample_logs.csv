@@ -1,0 +1,4 @@
+timestamp,hostname,source_type,severity,process,message,src_ip,dst_ip,action
+2026-09-03T09:49:00Z,fw-dmz-01,Firewall,WARNING,policy-engine,Connection denied by rule DMZ-DENY-ALL,198.51.100.22,10.20.30.5,deny
+2026-09-03T09:49:15Z,fw-dmz-01,Firewall,INFO,policy-engine,Session established,10.20.30.5,93.184.216.34,allow
+2026-09-03T09:50:02Z,proxy-01,Proxy,ERROR,squid,Upstream timeout fetching resource,10.20.30.77,203.0.113.200,timeout

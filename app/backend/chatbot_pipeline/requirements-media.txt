@@ -1,0 +1,39 @@
+# Pinned, not floated. The air-gapped handover ships built images whose
+# versions are frozen; leaving `>=` here meant a rebuild produced a
+# different system from the one that was tested. Every version below was
+# read out of the built image with importlib.metadata on 2026-09-04,
+# not chosen from a changelog.
+# ============================================================================
+# MEDIA - speech, vision and document generation for the chat.
+#
+# Kept in a SEPARATE file from requirements.txt, and installed after the
+# embedding and reranker models are baked, purely for build economics: those
+# two pulls are several GB, and putting these packages in requirements.txt
+# would invalidate that layer and re-download both models every time a media
+# dependency changed.
+#
+# All three are optional at runtime. media.py probes for each and reports what
+# is missing instead of failing, so an image built without them still serves
+# the chat - it just does not offer the microphone.
+# ============================================================================
+
+# PPTX export. Pure Python, no model, ~5MB.
+python-pptx==1.0.2
+
+# Speech to text. Pulls ctranslate2; the model itself is baked below.
+faster-whisper==1.2.1
+
+# Text to speech. Pulls onnxruntime; the voice is baked below.
+piper-tts==1.7.0
+
+# PDF generation for prompt-driven reports ("a 3 page PDF on ..."). Pure
+# Python, ~3MB. The per-answer PDF export is done in the browser and needs
+# nothing here; this is for documents the user asks the system to write.
+reportlab==5.0.1
+
+# Word output. A report gets edited and circulated, which a PDF does not, so
+# .docx is the report format and PDF is the print-ready copy.
+python-docx==1.2.0
+# Raster backend for reportlab's renderPM - Word has no chart API, so the same
+# chart drawings are rasterised for it.
+rlPyCairo==0.4.0

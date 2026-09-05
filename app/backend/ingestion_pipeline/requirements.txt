@@ -1,0 +1,48 @@
+# Pinned, not floated. The air-gapped handover ships built images whose
+# versions are frozen; leaving `>=` here meant a rebuild produced a
+# different system from the one that was tested. Every version below was
+# read out of the built image with importlib.metadata on 2026-09-04,
+# not chosen from a changelog.
+# ============================================================================
+# CORE
+# ============================================================================
+requests==2.34.2
+
+# ============================================================================
+# KAFKA
+# ============================================================================
+confluent-kafka==2.15.0
+
+# ============================================================================
+# NEO4J - the pipeline's only datastore (logs, entity graph and embeddings)
+# ============================================================================
+neo4j==6.3.0
+
+# ============================================================================
+# EMBEDDINGS (torch is installed separately from the CPU-only wheel index
+# in the Dockerfile, before this file, to avoid pulling in CUDA binaries)
+# ============================================================================
+sentence-transformers==6.0.1
+
+# ============================================================================
+# INGESTION CONTROL API (api.py) - modes + custom-log upload, what the
+# frontend's Modes tab talks to. Not needed for the `python -m batch.*` CLI.
+# python-multipart is what FastAPI uses to read multipart/form-data, which is
+# how an uploaded file arrives; without it every upload fails at request
+# parsing rather than anywhere informative.
+# ============================================================================
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+python-multipart==0.0.32
+
+# python-dotenv makes .env actually apply to the `python -m batch.*` CLI, not
+# just the API entry points (core/config.py loads it). Optional - without it
+# the pipeline still runs, but only from real environment variables.
+python-dotenv==1.2.3
+
+# ----------------------------------------------------------------------------
+# NOTE: the parser itself has no third-party dependencies at all - it is pure
+# standard library. `python -m batch.parse_logs` therefore runs on a bare
+# Python 3.10+ install; only the Neo4j write path and embeddings need anything
+# from this file, and Kafka only matters to the realtime pipeline.
+# ----------------------------------------------------------------------------

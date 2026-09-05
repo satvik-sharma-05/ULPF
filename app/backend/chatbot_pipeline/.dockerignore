@@ -1,0 +1,11 @@
+.env
+.env.example
+__pycache__/
+*.pyc
+.git
+*.tar
+*.tar.gz
+
+# The frontend is its own build context (../frontend), never this one's.
+frontend/
+chat_sessions.db

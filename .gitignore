@@ -1,0 +1,65 @@
+# ============================================================================
+# NEVER COMMIT
+# ============================================================================
+# Captured log data - 33 GB of real events from the estate this was developed
+# against: hostnames, usernames, internal addresses. This is the most
+# important line in this file. The repository is public and that data is not
+# ours to publish.
+#
+# sample_logs.{txt,xml,csv} at the repo root ARE committed - they are
+# synthetic, use RFC 2606 documentation domains and RFC 5737 documentation
+# addresses, and exist so the parser has something to be tested against.
+logs/
+**/data/logs/
+*.ndjson
+output.json
+parsed*.json
+ledger*.json
+
+# Credentials. .env.example ships and documents every key; .env never does.
+.env
+.env.local
+*.pem
+*.key
+
+# Model weights (~8.8 GB) - fetched at deploy time, not source.
+ollama/
+models/
+*.onnx
+*.gguf
+
+# Internal transfer tooling and run artifacts, not part of the submission.
+build/
+artifacts/
+docs/tempmd/
+
+# Build outputs - gigabytes, and reproducible from source.
+*.tar
+images/
+dist/
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Runtime state
+*.sqlite
+*.sqlite3
+chat_sessions.db
+*.log
+checkpoint.json
+embed_checkpoint.json
+backfill.json
+test_*_results.json
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

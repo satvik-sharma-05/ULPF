@@ -1,0 +1,67 @@
+/* Self-hosted variable fonts, bundled into the build by Vite.
+ *
+ * npm packages rather than a Google Fonts @import on purpose: this app ships
+ * to an AIRGAPPED VM, where a runtime fetch from fonts.googleapis.com fails
+ * silently and drops the whole UI into a fallback nobody chose. Importing
+ * them here means the woff2 files are emitted into dist/ and served from the
+ * same origin as everything else. */
+@import '@fontsource-variable/nunito';
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/plus-jakarta-sans';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Typeface roles. Fallbacks stay in each stack so the UI still renders sanely
+ * if a font file fails to load. */
+:root {
+  /* Nunito carries the headings: rounded terminals and a high x-height read
+     warm and friendly, which is the register this product wants. Inter stays
+     on body copy - a display face at 11px is just noise - and JetBrains Mono
+     on log lines, where a real mono is not optional.
+     `--font-fun` and `--font-alt` are the extra faces the headline cycles
+     through; they are deliberately NOT wired to anything else. */
+  --font-display: "Nunito Variable", "Segoe UI", system-ui, sans-serif;
+  --font-fun: "Fraunces Variable", Georgia, serif;
+  --font-alt: "Plus Jakarta Sans Variable", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Inter Variable", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "Cascadia Code", Consolas, monospace;
+  /* Base bumped from the browser default 16px so the whole UI scales up
+     together - every rem-based size follows from this one number. */
+  font-size: 17px;
+}
+
+html, body, #root {
+  background: #FFFBF5;   /* warm cream, matches CHROME.pagePlane */
+  color-scheme: light;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+code, pre, .font-mono { font-family: var(--font-mono); }
+
+/* Headings take the display face. Larger type needs tighter tracking to stay
+   optically even, and the display face is drawn to carry it. */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+/* Tabular figures wherever numbers stack in a column, so digits align. */
+.tabular { font-variant-numeric: tabular-nums; }
+
+input[type='checkbox'] { accent-color: #F76707; }
+::placeholder { color: #94826F; }
+::selection { background: #FFD8A8; color: #2B2118; }
+:focus-visible { outline: 2px solid #F76707; outline-offset: 1px; }
+
+* { scrollbar-width: thin; scrollbar-color: #DFCDB6 #FFF4E6; }
+*::-webkit-scrollbar { width: 11px; height: 11px; }
+*::-webkit-scrollbar-track { background: #FFF4E6; }
+*::-webkit-scrollbar-thumb { background: #DFCDB6; border-radius: 6px; }
+*::-webkit-scrollbar-thumb:hover { background: #F76707; }

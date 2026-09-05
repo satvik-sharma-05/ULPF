@@ -1,0 +1,34 @@
+# Pinned, not floated. The air-gapped handover ships built images whose
+# versions are frozen; leaving `>=` here meant a rebuild produced a
+# different system from the one that was tested. Every version below was
+# read out of the built image with importlib.metadata on 2026-09-04,
+# not chosen from a changelog.
+# ============================================================================
+# CHATBOT PIPELINE
+# Standalone: needs only a Neo4j instance the ingestion pipeline has populated.
+# ============================================================================
+
+# Graph access - the only hard requirement
+neo4j==6.3.0
+
+# LLM calls (Ollama HTTP API)
+requests==2.34.2
+
+# ----------------------------------------------------------------------------
+# DEMO FRONTEND API (api.py). Not needed for the chat.py CLI.
+# ----------------------------------------------------------------------------
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+python-dotenv==1.2.3
+
+# ----------------------------------------------------------------------------
+# OPTIONAL: vector search over (:Log).embedding.
+# Without these the chatbot still works - GraphRAG falls back to the full-text
+# index, which is weaker but needs no model. Install them only if the graph was
+# ingested with --embed, and make sure EMBEDDING_MODEL matches what produced
+# those vectors, or the nearest-neighbour results will be meaningless.
+#
+#   pip install sentence-transformers
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+# ----------------------------------------------------------------------------
+# sentence-transformers>=2.7.0

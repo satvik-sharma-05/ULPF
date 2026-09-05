@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Events>
+  <Event>
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing"/>
+      <EventID>4625</EventID>
+      <Level>0</Level>
+      <TimeCreated SystemTime="2026-09-03T09:48:00.000Z"/>
+      <Computer>SRV-DC-02.corp.example</Computer>
+    </System>
+    <EventData>
+      <Data Name="TargetUserName">administrator</Data>
+      <Data Name="IpAddress">203.0.113.44</Data>
+      <Data Name="LogonType">3</Data>
+      <Data Name="FailureReason">Unknown user name or bad password</Data>
+    </EventData>
+  </Event>
+  <Event>
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing"/>
+      <EventID>4672</EventID>
+      <Level>0</Level>
+      <TimeCreated SystemTime="2026-09-03T09:48:30.000Z"/>
+      <Computer>SRV-DC-02.corp.example</Computer>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserName">svc-admin</Data>
+      <Data Name="PrivilegeList">SeDebugPrivilege</Data>
+    </EventData>
+  </Event>
+</Events>

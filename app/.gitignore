@@ -1,0 +1,29 @@
+# Credentials - only .env.example is committed
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Run artifacts
+*.log
+output.json
+output.json.gz
+backfill.json
+embed_checkpoint.json
+sessions.db
+sessions.db-wal
+sessions.db-shm
+
+# Model weights - pulled at image build time, never committed
+backend/ollama/models/

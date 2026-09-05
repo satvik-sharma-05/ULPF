@@ -1,0 +1,97 @@
+# ============================================================================
+# CHATBOT STACK: ollama (LLM) + backend (FastAPI) + frontend (React/nginx)
+#
+# Ollama is now PART of this stack, built from ../ollama/Dockerfile with
+# qwen3:14b baked in at image-build time (the offline VM has no internet
+# access, so the model can't be pulled at container start). It replaces a
+# natively-installed Ollama entirely - don't run one alongside this.
+#
+# All three services use `network_mode: host` instead of a custom bridge
+# network. This is specifically because of Ollama: `ollama serve` binds to
+# 127.0.0.1 by default, which a container on an ordinary bridge network
+# cannot reach even via host.docker.internal (that only routes to the host's
+# external-facing address, not literally 127.0.0.1). Host networking sidesteps
+# the whole problem - "localhost" inside every container really is the VM's
+# localhost, so backend -> ollama (localhost:11434) and backend -> Neo4j
+# (localhost:7687, whether that's the bundled sandbox container or an
+# externally-hosted Neo4j reached by setting NEO4J_URI to its IP) both just work,
+# with no need to join a custom network at all.
+#
+# Trade-off, accepted deliberately for a single-purpose demo VM: host network
+# mode gives up container network isolation, and `ports:` mappings are
+# meaningless under it (removed below - the containers bind directly to the
+# host's ports, which is why nginx listens on 3000 - see ../../frontend/nginx.conf).
+#
+#   docker compose up -d
+#   docker compose logs -f backend
+#   docker compose down
+# ============================================================================
+
+services:
+  ollama:
+    image: ollama-qwen3:latest
+    build:
+      context: ../ollama
+      dockerfile: Dockerfile
+    container_name: ollama
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ollama_data:/root/.ollama
+    logging:
+      driver: "json-file"
+      options: { max-size: "20m", max-file: "3" }
+
+  backend:
+    depends_on: [ollama]
+    image: chatbot-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chatbot-backend
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      NEO4J_URI: ${NEO4J_URI:-bolt://localhost:7687}
+      NEO4J_USER: ${NEO4J_USER:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-sandboxpassword}
+      NEO4J_DATABASE: ${NEO4J_DATABASE:-neo4j}
+      CHATBOT_LLM_PROVIDER: ollama
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://localhost:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:14b}
+      CHATBOT_TIMEOUT: ${CHATBOT_TIMEOUT:-120}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-m3}
+      EMBEDDING_DEVICE: ${EMBEDDING_DEVICE:-cpu}
+      EMBEDDING_DIM: ${EMBEDDING_DIM:-1024}
+      NEO4J_VECTOR_INDEX: ${NEO4J_VECTOR_INDEX:-log_embedding_index}
+      NEO4J_FULLTEXT_INDEX: ${NEO4J_FULLTEXT_INDEX:-log_message_fulltext}
+      CHATBOT_RERANKER_ENABLED: ${CHATBOT_RERANKER_ENABLED:-true}
+      RERANKER_MODEL: ${RERANKER_MODEL:-BAAI/bge-reranker-v2-m3}
+      RERANKER_DEVICE: ${RERANKER_DEVICE:-cpu}
+      CHATBOT_RERANKER_TOP_N: ${CHATBOT_RERANKER_TOP_N:-15}
+      CHATBOT_ROUTER_THRESHOLD: ${CHATBOT_ROUTER_THRESHOLD:-0.6}
+      CHATBOT_GRAPHRAG_TOP_K: ${CHATBOT_GRAPHRAG_TOP_K:-8}
+      CHATBOT_GRAPHRAG_NEIGHBOURS: ${CHATBOT_GRAPHRAG_NEIGHBOURS:-16}
+      CHATBOT_CYPHER_ROW_LIMIT: ${CHATBOT_CYPHER_ROW_LIMIT:-100}
+      CHATBOT_MAX_CONTEXT_CHARS: ${CHATBOT_MAX_CONTEXT_CHARS:-12000}
+      CHATBOT_INTROSPECT_SCHEMA: ${CHATBOT_INTROSPECT_SCHEMA:-true}
+      CHATBOT_PLANNER_MAX_ROUNDS: ${CHATBOT_PLANNER_MAX_ROUNDS:-3}
+      CHATBOT_PLANNER_MAX_TOOL_CALLS: ${CHATBOT_PLANNER_MAX_TOOL_CALLS:-6}
+      CHATBOT_PLANNER_MAX_ROWS_PER_TOOL: ${CHATBOT_PLANNER_MAX_ROWS_PER_TOOL:-20}
+      API_CORS_ORIGINS: ${API_CORS_ORIGINS:-*}
+    logging:
+      driver: "json-file"
+      options: { max-size: "20m", max-file: "3" }
+
+  frontend:
+    image: chatbot-frontend:latest
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+    container_name: chatbot-frontend
+    restart: unless-stopped
+    depends_on: [backend]
+    network_mode: host
+
+volumes:
+  ollama_data:

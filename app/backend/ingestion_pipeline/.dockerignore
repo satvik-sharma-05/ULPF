@@ -1,0 +1,33 @@
+# Secrets: docker-compose injects env vars at runtime, the image never needs
+# these baked in - keeps credentials out of the image layers entirely.
+.env
+.env.example
+
+__pycache__/
+*.pyc
+
+# Don't try to copy a multi-GB image tar into its own build context.
+docker_images_offline.tar
+docker_images_offline.tar.gz
+*.zip
+
+logs/
+output/
+models/
+.git
+
+# Parsed corpus output and offline-transfer artifacts - these live alongside
+# the code on the airgapped VM but must never be baked into the image itself
+# (output.json.gz alone was 10+ GB; parsed_by_folder/ is 12GB - COPY . .
+# would otherwise include either).
+output*.json
+output*.json.gz
+*.jsonl
+*.jsonl.gz
+*.json.gz
+*.tar
+*.tar.gz
+parsed_by_folder/
+comparison_results.json
+embed_checkpoint.json
+state/

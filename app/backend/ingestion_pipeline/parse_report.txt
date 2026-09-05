@@ -1,0 +1,154 @@
+==========================================================================
+PARSE SUMMARY
+==========================================================================
+Input path       : ./logs
+Files parsed     : 9,186 of 9,186
+Records written  : 116,889,850  ->  output.json.gz
+Read/parse errors: 0
+Elapsed          : 12,167.5s (9,607 records/sec)
+Recognized by a specific detector : 116,888,911 (100.00%)
+Entities extracted : 263,147,103 (2.3 per log)
+
+By source_type:
+  ESXi                         31,424,730
+  AriaAutomation               21,530,220
+  JVM_GC                       17,518,331
+  LinuxAudit                   13,759,371
+  NSX                           8,556,192
+  CASA                          4,675,416
+  vROps                         4,347,961
+  CoreDNS                       4,333,244
+  Syslog                        2,648,521
+  Kubernetes                    2,369,629
+  PostgreSQL                    1,695,561
+  WindowsSecurityAudit          1,504,657
+  SRM                           1,385,814
+  HMS                             603,335
+  Squid                           214,568
+  MinIO                           183,336
+  vCenter                          95,177
+  Horizon                          26,864
+  WindowsEventLog                  15,799
+  Unknown                             939
+  LogForwarder                        185
+
+Entities by type (these become graph nodes):
+  thread                       38,102,421
+  k8s_service                  28,616,467
+  trace                        25,819,044
+  pod                          21,409,056
+  user                         18,809,648
+  ip                           18,252,896
+  gc_cycle                     14,585,212
+  endpoint                     13,738,617
+  uuid                         12,540,799
+  file                         11,514,773
+  operation                     7,858,163
+  dns_name                      7,311,675
+  namespace                     7,210,648
+  url                           6,537,132
+  port                          5,121,714
+  queue                         4,065,202
+  executable                    2,993,507
+  managed_object                2,614,659
+  session                       2,251,512
+  syscall                       2,190,276
+  network_interface             2,018,170
+  api_method                    1,690,199
+  systemd_unit                  1,669,362
+  event_id                      1,520,456
+  domain                        1,284,706
+  object_key                      936,564
+  device                          575,238
+  mac_address                     470,012
+  task                            388,670
+  vm                              356,789
+  datastore                       341,884
+  bucket                          180,618
+  package                          77,035
+  error_code                       49,899
+  security_id                      38,610
+  apparmor_profile                  5,470
+
+By matched_format:
+  aria_automation_springboot           21,409,056  (18.32%)
+  jvm_gc                               17,518,331  (14.99%)
+  appliance_placeholder_syslog         13,093,936  (11.20%)
+  esxi_generic_proc                    12,775,938  (10.93%)
+  envoy_access                         10,970,807  ( 9.39%)
+  esxi_originator                       5,273,801  ( 4.51%)
+  nsx_esx_agent                         4,859,254  ( 4.16%)
+  casa_ajp                              4,377,842  ( 3.75%)
+  coredns                               4,333,244  ( 3.71%)
+  vrops_bridge                          4,279,713  ( 3.66%)
+  rfc3164_wrapper                       4,110,797  ( 3.52%)
+  nsx_manager                           3,696,938  ( 3.16%)
+  vmkernel                              2,331,930  ( 1.99%)
+  postgres_log                          1,692,823  ( 1.45%)
+  windows_security_event                1,520,456  ( 1.30%)
+  vmacore_appliance                     1,385,814  ( 1.19%)
+  kubelet_glog                          1,299,571  ( 1.11%)
+  k8s_access                            1,069,999  ( 0.92%)
+  apache_combined_bracket_first           297,574  ( 0.25%)
+  squid_access                            214,568  ( 0.18%)
+  vcenter_server                           95,177  ( 0.08%)
+  spring_actuator_access                   77,782  ( 0.07%)
+  esxi_bare_proc_message                   55,776  ( 0.05%)
+  vcops_watchdog                           46,281  ( 0.04%)
+  vrlcm_classic_logback                    38,818  ( 0.03%)
+  vrops_session_audit                      21,967  ( 0.02%)
+  horizon_view_audit                       16,694  ( 0.01%)
+  esxi_dump_continuation                   14,037  ( 0.01%)
+  appliance_py_script_log                   4,203  ( 0.00%)
+  postgres_native_log                       2,738  ( 0.00%)
+  esxupdate                                 2,169  ( 0.00%)
+  generic_fallback                            939  ( 0.00%)
+  rabbitmq_log                                288  ( 0.00%)
+  healthd_plugin_status                       272  ( 0.00%)
+  cfapi_trace                                 185  ( 0.00%)
+  vracli                                       65  ( 0.00%)
+  bare_level_logger_log                        31  ( 0.00%)
+  deployment_health_log                        28  ( 0.00%)
+  aria_appliance_bracket                        8  ( 0.00%)
+
+Unmatched samples (184 unique) - each is a candidate for a new detector in core/parsers/:
+  '(root) CMDOUT ()'
+  '(root) CMDOUT (Running check services)'
+  '+ kubectl get pods --all-namespaces --field-selector spec.schedulerName=predictable-pod-scheduler,spec.nodeName=,status.phase=Pending --output json'
+  '+ sleep 5s'
+  '+ true'
+  "+ xargs -n 1 -I '{}' -P 0 -t timeout 15s /bin/bash -c '{}'"
+  '/var/log/services-logs/kube-system/kube-dns/console-logs/coredns.log.20260619040035.0: 796.2 KiB / 9,418.8 KiB = 0.085, 0:01'
+  '/var/log/services-logs/prelude/form-service-app/console-logs/form-service-app.log.20260616040041.0: 31.4 KiB / 436.9 KiB = 0.072'
+  '/var/log/services-logs/prelude/vco-app/file-logs/vco-server-app_metrics.log.2026062304.1: 68.9 KiB / 1,730.4 KiB = 0.040'
+  '2026-06-12T03:17:09,696+0000 INFO [ajp��\x00\x05sr\x00Ccom.vmware.vcops.platform.api.model.common.param.ChunkExchangeParam�Jǿ(~&�\x02\x00\x04I\x00\x0bcollectorIdZ\x00\x14requestConfigurationL\x00\x13chunksToBeProcessedt\x00\x16Ljava/util/Coll'
+  '2026-06-12T03:17:35,728+0000 INFO [ajp-ni�D�����4\x03\x00\x00xpw\x0c\x00\x00\x00\x01?@\x00\x00\x00\x00\x00\x00x]'
+  '2026-06-12T03:18:45,670+0000 INFO [ajp-nio-127.0.0.1-8010-exec-33, S6VASNKsOIoyMfSyzqjBUWaaxVAuTuCc] utils.HttpRequestLog��\x00\x05sr\x00Ccom.vmware.vcops.platform.api.model.common.param.ChunkExchangeParam�Jǿ('
+  '2026-06-12T03:19:38,429+0000 INFO [ajp-nio-1��\x00\x05sr\x00Ccom.vmware.vcops.platform.api.model.common.param.ChunkExchangeParam�Jǿ(~&�\x02\x00\x04I\x00\x0bcollectorIdZ\x00\x14requestConfigurationL\x00\x13chunksToBeProcessedt\x00\x16Ljava/uti'
+  '2026-06-12T03:20:29,082+0000 INFO [ajp-nio-127.0.0.1-8010-exec-33, lF9hhrSVRv21��\x00\x05sr\x00Ccom.vmware.vcops.platform.api.model.common.param.ChunkExchangeParam�Jǿ(~&�\x02\x00\x04I\x00\x0bcollectorIdZ\x00\x14requestConfiguratio'
+  '2026-06-12T04:04:50,338+0000 INFO [ajp-nio-127.0.0.1-8010-exec-32, 0xxYg7NQiiDDCceOL8uk357svbRrl1lM] utils.HttpRequestL��\x1d��a�\x03\x00\x01I\x00\x04sizexp\x00\x00\x00\x00w\x04\x00\x00\x00\x00xsr\x00\x11java.util.HashSet�D�����4\x03\x00\x00xpw\x0c\x00\x00\x00\x01?@\x00\x00\x00\x00\x00\x00x]'
+  '2026-06-12T04:05:13,614+0000 INFO [ajp-nio-127.0.0.1��\x01���\x02\x00\x0bI\x00\x05airIdJ\x00\x0ecollectionTimeZ\x00\tisOldDataI\x00'
+  '2026-06-12T04:05:22,560+0000 INFO [ajp-nio-127.0.0.1-8010-exec-12, BJTzPbHQ7I37kBK0bpdzJ2FjcaTx⠤���8\x02\x00\x01I\x00\x05valuexr\x00\x10java.lang.Number���\x1d\x0b���\x02\x00\x00xp\x00\x00u0sr\x00\x11java.lang.Boolean� r�՜��\x02\x00\x01Z\x00\x05valuexp\x00]'
+  '2026-06-12T04:06:07,724+0000 INFO [ajp-nio-127.0.0.1-8010-exec-24, wK0Eha1RAgWV9kzCwce6yHCl7UqiLGB5] utils.HttpRequestLogger�Jǿ(~&�\x02\x00\x04I\x00\x0bcollectorIdZ\x00\x14requestConfigurationL\x00\x13chunksToBeProcessedt\x00\x16Ljav'
+  '2026-06-12T04:09:24,182+000��\x00\x05sr\x00Ccom.vmware.vcops.platform.api.model.common.param.ChunkExchangeParam�Jǿ(~&�\x02\x00\x04I\x00\x0bcollectorIdZ\x00\x14requestConfigurationL\x00\x13chunksToBeProcessedt\x00\x16Ljava/util/Collection;L\x00\x12p'
+  '2026-06-12T04:24:07.857Z DEBUG even⇢ Handler com.vmware.automation.event.broker.server.controller.SubscriptionController#subsEvents(String, String, String) [DispatcherHandler]'
+  "2026-06-15T04:14:53.379Z DEBUG event-broker [host='ebs-app-6f577dd6c-ttv86' thread='main-pool-24' user='approval-5XULL6bdphk9vLP6' org='' trace='6a2f7c3d92741c7a482ced28c8a91fe3' request-trace='2a0"
+  '2026-06-15T04:25:49.26'
+  "2026-06-15T04:54:30.521Z DEBUG event-broker [host='ebs-app-6f577dd6c-bmtsn' thread='main-pool-27' user='cmx-7Esh3gEAWxFd7XxO' org='' trace='6a2f7e7e92dba96e36eff3e57dd21038' request-trace='1f63f53c-6f"
+  "2026-06-15T04:54:33.555Z ERROR event-broker [host='ebs-app-6f577dd6c-nx248' thread='reactor-http-epol⇢ Handler com.vmware.automation.event.broker.server.controller.SubscriptionController#subsEvents(St"
+  "2026-06-15T04:54:33.580Z DEBUG event-broker [host='ebs-app-6f577dd6c-nx248' thread='main-pool-18' user='cmx-7Esh3gEAWxFd7XxO' org='' trace='6a2f7e817067c41d7333f646867dd41c' request-trace='aac3a815-53"
+  "2026-06-15T04:54:34.677Z ERROR event-broker [host='ebs-app-6f577dd6c-ttv86' thread='reactor-http-epoll-7' user='' org='' trace='' req⇢ Handler com.vmware.automation.event.broker.server.controller.Subs"
+  "2026-06-15T05:54:30.509Z DEBUG event-broker [host='ebs-app-6f577dd6c-bmtsn' thread='main-pool-43' user='cmx-7Esh3gEAWxFd⇢ Handler com.vmware.automation.event.broker.server.controller.SubscriptionContr"
+  '2026-06-15T05:54:33.605Z DEBUG event-broker [host=\'ebs-app-6f577dd6c-nx248\' thread=\'main-pool-38\' user=\'project-U22ZHTyl29fUXL4Y\' org=\'\' trace=\'6969e1e16a56605ddfeeca373⇢ HTTP GET "/event-broker/api/s'
+  '2026-06-15T05:54:34.746Z ERR⇢ Handler com.vmware.automation.event.broker.server.controller.SubscriptionController#subsEvents(String, String, String) [DispatcherHandler]'
+  "2026-06-15T05:58:31.467Z INFO vco [host='vco-app-5c86bb7c5d-stxln' thread='http-nio-8280-exec-11791' user='vro-gateway-mYyrvCrgNo"
+  "2026-06-16T04:24:33.745Z INFO event-broker [host='ebs-app-6f577dd6c-bmtsn' thread='rabbitmq-nio' user='' org⇢ com.vmware.automation.spring.webflux.platform.server.observability.DiagnosticFieldsPropaga"
+  '2026-06-16T04:24:34.836Z ERROR event-⇢ HTTP GET "/event-broker/api/subscriptions/broker.broadcast.command-cache.invalidate-projects-provisioning/sub?broadcastId=dd7dac77-98f3-4c92-a950-b8b665964a67" ['
+  "2026-06-16T04:27:22.840Z INFO catalog-service-app [host='catalog-service-app-6dccb44766-jpptm' thread='http-nio-8000-exec-40' user='catalog-Xyl08ynucLq9A48G' org='e0cbe388"
+  "2026-06-16T04:27:33.305Z INFO catalog-service-app [host='catalog-service-app-6dccb44766-jpptm' thread='http-nio-8000-exec-40' user='catalog-Xyl08ynucLq9A48G' org='e0cbe388-01f7-49ed-b56e-7104c405595b'"
+  '2026-06-16T04:54:38.923Z ⇢ Handler com.vmware.automation.event.broker.server.controller.SubscriptionController#subsEvents(String, String, String) [DispatcherHandler]'
+  "2026-06-16T04:54:39.854Z DEBUG event-broker [host='ebs-app-6f577dd6c-nx248' thread='main-pool-25' user='cmx-7Esh3gEAWxFd7XxO' org='' trace='6a30d007a31494d5d3bee10112e14731' request-trace='afd9be39-81"
+  "2026-06-16T05:54:39.024Z DEBUG event-broker [host='ebs-app-6f577dd6c-bmtsn' thread='main-pool-22' user='cmx-7Esh3gEAWxFd7XxO' org='' trace='6a30de17⇢ Handler com.vmware.automation.event.broker.server."
+  '2026-06-16T05:54:41.843Z DEBUG event-broke⇢ Handler com.vmware.automation.event.broker.server.controller.SubscriptionController#subsEvents(String, String, String) [DispatcherHandler]'
+  "2026-06-16T05:54:41.861Z DEBUG event-broker [host='ebs-app-6f577dd6c-ttv86' thread='main-pool-16' user='cmx-7Esh⇢ AuthorizationWebFilter [DefaultWebFilterChain]"
+  '2026-06-17T02:59:00,153+0000 INFO [ajp-nio-127.0.0.1-8010-exec-9, w8NeCVfoXCB6G3OiZLel7xKhE00iQDno] utils.HttpReque��\x00\x05sr\x00Ccom.vmware.vcops.platform.api.model.common.param.ChunkExchangeParam�Jǿ(~&�\x02\x00\x04'

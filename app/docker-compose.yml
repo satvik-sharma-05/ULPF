@@ -1,0 +1,102 @@
+# ============================================================================
+# Universal Log Pre-processing Framework - air-gapped deployment
+#
+#     ./load_images.sh && docker compose up -d
+#
+# Every image is loaded from images/*.tar - nothing is pulled and nothing is
+# built here. `image:` with no `build:` is deliberate: a build directive would
+# send the VM to PyPI, npm and Hugging Face the moment an image was missing,
+# and on an air-gapped network that fails after a long timeout instead of
+# immediately. Missing image, missing tar - the failure is obvious.
+#
+# Neo4j is included for a self-contained deployment. If the organisation
+# already runs Neo4j at neo4j.internal.example (the address the .env files carry),
+# comment the neo4j service out and leave the .env alone.
+# ============================================================================
+
+services:
+  neo4j:
+    image: neo4j:5-community
+    container_name: ulpf-neo4j
+    environment:
+      # No default: an unconfigured deployment fails at start rather than
+      # coming up with a password somebody else chose.
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?set NEO4J_PASSWORD before starting}
+      NEO4J_server_memory_heap_max__size: 4G
+      NEO4J_server_memory_pagecache_size: 2G
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7474:7474"   # browser
+      - "7687:7687"   # bolt
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
+    restart: unless-stopped
+
+  ollama:
+    # Stock upstream image with the model store mounted, rather than an image
+    # with the weights baked in. Baking produced a 26GB image AND a 26GB tar -
+    # the same weights shipped twice - which does not fit alongside everything
+    # else. Mounted, they ship once as files.
+    #
+    # Nothing is pulled at runtime: the store already contains the chat model
+    # and the vision model, so Ollama finds them locally on an air-gapped VM.
+    image: ollama/ollama:latest
+    container_name: ulpf-ollama
+    volumes:
+      - ./backend/ollama/models:/root/.ollama/models
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+
+  ingestion:
+    image: ulpf-ingestion:latest
+    container_name: ulpf-ingestion
+    env_file: [./backend/ingestion_pipeline/.env]
+    depends_on:
+      neo4j: {condition: service_healthy}
+    ports:
+      - "8020:8020"
+    volumes:
+      # Drop log files here to ingest them from the host.
+      - ./data/logs:/app/logs
+    restart: unless-stopped
+
+  analytics:
+    image: ulpf-analytics:latest
+    container_name: ulpf-analytics
+    env_file: [./backend/analytics_pipeline/.env]
+    depends_on:
+      neo4j: {condition: service_healthy}
+    ports:
+      - "8010:8010"
+    restart: unless-stopped
+
+  chatbot:
+    image: ulpf-chatbot:latest
+    container_name: ulpf-chatbot
+    env_file: [./backend/chatbot_pipeline/.env]
+    depends_on:
+      neo4j: {condition: service_healthy}
+      ollama: {condition: service_started}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    image: ulpf-frontend:latest
+    container_name: ulpf-frontend
+    depends_on: [analytics, chatbot, ingestion]
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  neo4j_data:
+  neo4j_logs:

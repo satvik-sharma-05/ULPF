@@ -1,0 +1,38 @@
+<166>Sep  3 09:16:11 asa-edge-01 %ASA-6-302013: Built inbound TCP connection 129472 for outside:203.0.113.9/54321 to inside:10.20.30.43/443
+<33>Sep  3 09:17:02 ids-sensor-01 snort[2841]: [1:2013028:5] ET POLICY curl User-Agent Outbound [Classification: Attempted Information Leak] [Priority: 2] {TCP} 10.20.30.44:55112 -> 198.51.100.7:80
+<189>Sep  3 09:18:44 sw-core-02 %LINK-3-UPDOWN: Interface GigabitEthernet0/24, changed state to down
+<134>Sep  3 09:19:30 bigip-waf-01 ASM:unit_hostname="bigip-waf-01",violations="Illegal HTTP method",support_id="884721",request_status="blocked",ip_client="203.0.113.55"
+<134>Sep  3 09:20:01 vpn-gw-01 openvpn[1123]: user01/203.0.113.77:1194 TLS: Username/Password authentication succeeded for user01
+<134>Sep  3 09:21:15 pfsense-01 filterlog: 5,,,1000000103,igb0,match,block,in,4,0x0,,64,54321,0,DF,6,tcp,60,203.0.113.88,10.20.30.9,443,51514,0
+date=2026-09-03 time=09:22:03 devname="FGT-EDGE-01" devid="FG100E" logid="0100032002" type="traffic" subtype="forward" level="warning" srcip=10.20.30.41 dstip=8.8.8.8 srcport=44321 dstport=53 action="blocked" policyid=17 service="DNS" msg="Denied by firewall policy"
+CEF:0|Palo Alto Networks|PAN-OS|10.2|threat|url|5|rt=Sep 03 2026 09:23:22 src=10.20.30.40 dst=93.184.216.34 spt=51514 dpt=443 act=deny cs1Label=Rule cs1=Block-Malware-URL cn1Label=SessionID cn1=884721
+LEEF:2.0|Check Point|Firewall|R81|Drop|devTime=1788412522000|src=10.20.30.42|dst=172.217.16.14|srcPort=39221|dstPort=80|proto=TCP|action=Drop|rule=Clean-Up|sev=6
+1788412875.123    142 10.20.30.50 TCP_DENIED/403 4213 GET http://malware.example/payload.exe - HIER_NONE/- text/html
+Sep  3 09:25:10 web-srv-07 sshd[4412]: Failed password for invalid user admin from 203.0.113.101 port 52344 ssh2
+Sep  3 09:25:44 web-srv-07 sudo:    alice : TTY=pts/0 ; PWD=/home/alice ; USER=root ; COMMAND=/usr/bin/systemctl restart nginx
+Sep  3 09:26:02 db-srv-02 kernel: [12345.678901] TCP: request_sock_TCP: Possible SYN flooding on port 5432
+2026-09-03T09:27:11.482Z esx-host-11.corp.example Hostd: info hostd[2098633] [Originator@6876 sub=Vimsvc.ha-eventmgr] Event 1451 : User root@127.0.0.1 logged in as pyvmomi
+2026-09-03T09:28:00.114Z nsx-mgr-03 NSX 3320 - [nsx@6876 comp="nsx-manager" subcomp="manager" level="ERROR"] Transport node connection lost
+2026-09-03 09:29:44.221 UTC [4412] postgres@orders LOG:  duration: 3821.442 ms  statement: SELECT * FROM orders WHERE created_at > now() - interval '7 days'
+2026-09-03 09:30:02.910 UTC [4415] app@billing FATAL:  password authentication failed for user "app"
+2026-09-03T09:31:04.221Z INFO  [http-nio-8443-exec-9] c.n.v.a.OrderController - Order 88213 accepted for customer 44219
+2026-09-03T09:31:55.007Z ERROR [scheduler-3] o.s.s.s.TaskUtils$LoggingErrorHandler - Unexpected error occurred in scheduled task java.lang.NullPointerException
+[2026-09-03T09:32:10.442+0000][gc] GC(881) Pause Young (Normal) (G1 Evacuation Pause) 512M->128M(2048M) 24.118ms
+{"eventTime":"2026-09-03T09:33:00Z","eventSource":"s3.amazonaws.com","eventName":"DeleteBucket","awsRegion":"ap-south-1","sourceIPAddress":"203.0.113.9","recipientAccountId":"123456789012","errorCode":"AccessDenied","userIdentity":{"type":"IAMUser","userName":"svc-backup","arn":"arn:aws:iam::123456789012:user/svc-backup"}}
+{"time":"2026-09-03T09:34:11Z","resourceId":"/SUBSCRIPTIONS/abc-123/RESOURCEGROUPS/prod/PROVIDERS/MICROSOFT.COMPUTE/VIRTUALMACHINES/vm-web-01","operationName":"Microsoft.Compute/virtualMachines/write","category":"Administrative","resultType":"Failed","level":"ERROR","caller":"ops@contoso.com"}
+{"timestamp":"2026-09-03T09:35:02Z","severity":"NOTICE","protoPayload":{"serviceName":"compute.googleapis.com","methodName":"v1.compute.instances.delete","authenticationInfo":{"principalEmail":"dev@example.com"},"status":{"code":7,"message":"PERMISSION_DENIED"}},"resource":{"labels":{"project_id":"prod-1","instance_id":"inst-9"}}}
+{"kind":"Event","verb":"delete","requestURI":"/api/v1/namespaces/prod/pods/web-7","requestReceivedTimestamp":"2026-09-03T09:36:00Z","user":{"username":"system:serviceaccount:ci:deployer"},"sourceIPs":["10.244.0.7"],"objectRef":{"resource":"pods"},"responseStatus":{"code":403}}
+I0903 09:37:12.442100    1823 kubelet.go:2183] "SyncLoop DELETE" source="api" pods="[prod/web-7]"
+[INFO] 10.244.0.230:55000 - 19358 "A IN redis-node-1.redis-headless.apps.svc.cluster.local. udp 71 false 512" NOERROR qr,aa,rd 146 0.000131s
+[2026-09-03T09:38:44.201Z] "POST /api/checkout HTTP/1.1" 503 UF 0 91 12 - "10.244.0.9" "curl/8.4.0" "b1f2-4d" "api.internal" "10.244.2.31:8080"
+{"metadata":{"eventType":"DetectionSummaryEvent","eventCreationTime":"2026-09-03T09:39:00Z"},"event":{"ComputerName":"WKS-FIN-014","Severity":5,"SeverityName":"CRITICAL","DetectName":"Credential Dumping","DetectDescription":"LSASS memory access by unsigned binary","FileName":"rundll32.exe"}}
+{"AlertId":"da6371829","Severity":"High","Title":"Suspicious PowerShell execution","Category":"Execution","DeviceName":"SRV-DC-02","AlertTime":"2026-09-03T09:40:00Z"}
+{"published":"2026-09-03T09:41:00.000Z","eventType":"user.session.start","displayMessage":"User login to Okta","outcome":{"result":"FAILURE","reason":"INVALID_CREDENTIALS"},"actor":{"alternateId":"alice@corp.example","displayName":"Alice"},"client":{"ipAddress":"203.0.113.61"}}
+{"published":"2026-09-03T09:41:30.000Z","eventType":"user.account.lock","displayMessage":"Max sign in attempts exceeded","outcome":{"result":"DENY","reason":"LOCKED_OUT"},"actor":{"alternateId":"alice@corp.example"},"client":{"ipAddress":"203.0.113.61"}}
+{"isotimestamp":"2026-09-03T09:42:00Z","factor":"duo_push","integration":"VPN","result":"denied","reason":"user_marked_fraud","username":"bob","ip":"198.51.100.30"}
+<13>Sep  3 09:43:02 iot-gw-14 modbus-bridge[771]: sensor=TEMP-0042 zone=cold-store value=8.9 unit=C threshold=8.0 state=ALARM
+<14>Sep  3 09:43:40 iot-gw-14 mqtt-broker[812]: client=hvac-controller-7 topic=building/floor3/hvac qos=1 action=publish bytes=142
+<134>Sep  3 09:44:12 ups-pdu-03 apcupsd[601]: UPS battery capacity 27 percent, on battery power, runtime 8 minutes
+Sep  3 09:45:00 print-srv-01 cupsd[990]: Job 8821 completed successfully for user carol on printer HP-LJ-4th-Floor
+2026-09-03T09:46:10.004Z vrops-node-2 vrops-bridge[3312]: [ERROR] Adapter instance vCenter-Prod failed to collect metrics: connection refused
+2026-09-03T09:47:00.221Z hzn-conn-01 Horizon: AUDIT_SUCCESS user=DOMAIN\\dave desktop=WIN11-POOL-04 action=SESSION_CONNECT client=10.20.44.9

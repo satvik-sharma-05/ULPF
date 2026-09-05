@@ -1,0 +1,16 @@
+unzip LA_offline_bundle.zip
+cd LA && chmod +x ingestion_pipeline/*.sh chatbot_pipeline/*.sh   # safety net, in case unzip didn't preserve +x
+
+cd ingestion_pipeline
+docker load -i ingestion_image.tar && docker load -i neo4j_image.tar
+./offline_ingest_sample.sh          # first 5000 records + embeddings, few minutes
+
+cd ../chatbot_pipeline
+docker load -i chatbot_backend_image.tar && docker load -i chatbot_frontend_image.tar
+./offline_start_chatbot.sh          # needs native Ollama + qwen3:14b already running on the VM
+
+# Browser: http://<vm-ip>:3000   Neo4j Browser: http://<vm-ip>:7474 (neo4j/sandboxpassword)
+
+
+
+# Ollama + qwen should be already runnning 
