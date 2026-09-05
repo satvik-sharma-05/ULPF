@@ -36,39 +36,34 @@ flowchart LR
 
 ## 📸 Screenshots
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
 ### 🧪 Parser Lab
-*Paste any vendor's log, watch it parse live — nothing is stored*
+*Paste a log from any vendor and watch it parse live. Raw on the left, the
+normalised record on the right, with a byte-for-byte **preserved** check —
+and nothing is stored, so it is safe to run against production.*
 
 <img src="docs/screenshots/Parser_Lab.png" alt="Parser Lab" width="100%"/>
 
-</td>
-<td width="50%" valign="top">
+---
 
 ### 💬 Chat
-*Ask the graph in English, by voice, or with a screenshot*
+*Ask the graph in English. Text-to-Cypher shows the query it generated, charts
+are drawn on demand, and speech in/out runs locally.*
 
 <img src="docs/screenshots/chat.png" alt="Chat" width="100%"/>
 
-</td>
-</tr>
-</table>
+---
 
-### 📈 Analytics — volume, severity, hosts, anomalies
+### 📈 Analytics
+*Volume, severity, hosts and anomalies — with date-range, severity, source and
+free-text filters threaded through every aggregation.*
 
-<table>
-<tr>
-<td width="50%"><img src="docs/screenshots/Analytics_1.png" alt="Analytics overview" width="100%"/></td>
-<td width="50%"><img src="docs/screenshots/Analytics_2.png" alt="Analytics severity" width="100%"/></td>
-</tr>
-<tr>
-<td width="50%"><img src="docs/screenshots/Analytics_3.png" alt="Analytics hosts" width="100%"/></td>
-<td width="50%"><img src="docs/screenshots/Analytics_4.png" alt="Analytics trends" width="100%"/></td>
-</tr>
-</table>
+<img src="docs/screenshots/Analytics_1.png" alt="Analytics overview" width="100%"/>
+
+<img src="docs/screenshots/Analytics_2.png" alt="Analytics severity breakdown" width="100%"/>
+
+<img src="docs/screenshots/Analytics_3.png" alt="Analytics hosts" width="100%"/>
+
+<img src="docs/screenshots/Analytics_4.png" alt="Analytics trends" width="100%"/>
 
 ---
 
