@@ -15,7 +15,11 @@ import copy
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# analytics_pipeline/ - two levels up from ledger/tests/. Inserting only
+# one level put ledger/ itself on the path, so `from ledger import ...`
+# could not resolve when the file was run directly.
+sys.path.insert(0, os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__)))))
 
 from ledger import (GENESIS_HASH, block_hash, build_chain, check_proof,  # noqa: E402
                     event_leaf, head, node_hash, prove_event, raw_hash,
