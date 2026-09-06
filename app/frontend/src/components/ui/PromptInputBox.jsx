@@ -1,21 +1,59 @@
 import { useEffect, useRef, useState } from 'react'
 import { CHROME } from '../analytics/theme.js'
 
-/* PromptInputBox - the AI chat input from the 21st.dev spec (auto-growing
- * textarea, attachment chips, a toolbar of modes, a send button that arms
- * only when there is something to send).
+/* PromptInputBox - the chat composer, in the shape people already know.
  *
- * Built here rather than installed: that component pulls framer-motion,
- * lucide-react and two Radix packages, and this app ships as a Docker image
- * to an airgapped VM - four dependencies for an input box is weight we'd
- * carry forever. The behaviours that make it good (Enter to send / Shift+Enter
- * for newline, height that tracks content up to a cap, visible focus, a
- * disabled send with a reason) are all reproduced.
+ * Modelled on the ChatGPT composer because that is now the idiom for this kind
+ * of input: a single rounded field, a `+` menu on the left holding the things
+ * you do occasionally, and one round send button on the right. The previous
+ * version laid every control out as a row of rectangular buttons under the
+ * textarea, which meant the mode selector, attach, dictate and send all
+ * competed for attention with the thing people actually came to do, which is
+ * type a question.
+ *
+ * A deliberate departure from this project's own house style: everything else
+ * here uses square corners. An input people recognise is worth more than
+ * consistency with the rest of the chrome, and the composer is the one
+ * component where familiarity beats house style.
+ *
+ * Built rather than installed - the reference component pulls framer-motion,
+ * lucide-react and two Radix packages, and this ships as a Docker image to an
+ * airgapped VM. Four dependencies for an input box is weight carried forever.
+ * The behaviours that matter are reproduced: Enter sends, Shift+Enter breaks
+ * the line, the field grows to a cap, focus is visible, send is disabled with
+ * a reason, and Escape closes the menu.
  */
+
+const RADIUS = '26px'
+
+function PlusIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function SendIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" strokeWidth="2.4"
+        strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function StopIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="6" y="6" width="12" height="12" rx="1.5" fill="currentColor" />
+    </svg>
+  )
+}
+
 export default function PromptInputBox({
-  // Text pushed in from outside - dictation fills the composer rather
-  // than sending straight away, so a mis-heard word can be corrected
-  // before it becomes a question.
+  // Text pushed in from outside - dictation fills the composer rather than
+  // sending straight away, so a mis-heard word can be corrected first.
   prefill,
   extraControls,
   onSend,
@@ -27,18 +65,22 @@ export default function PromptInputBox({
   activeMode,
   onModeChange,
   allowAttachments = true,
+  // Entries for the `+` menu: { id, label, hint, onSelect }.
+  menuActions = [],
 }) {
   const [value, setValue] = useState('')
+  const [files, setFiles] = useState([])
+  const [focused, setFocused] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const textareaRef = useRef(null)
+  const fileRef = useRef(null)
+  const menuRef = useRef(null)
 
   useEffect(() => {
     if (prefill) setValue((v) => (v ? `${v} ${prefill}` : prefill))
   }, [prefill])
-  const [files, setFiles] = useState([])
-  const [focused, setFocused] = useState(false)
-  const textareaRef = useRef(null)
-  const fileRef = useRef(null)
 
-  // Grow with the content, but stop at ~8 lines so a pasted stack trace can't
+  // Grow with the content, but stop at ~8 lines so a pasted stack trace cannot
   // push the send button off screen.
   useEffect(() => {
     const el = textareaRef.current
@@ -51,6 +93,21 @@ export default function PromptInputBox({
     if (autoFocus) textareaRef.current?.focus()
   }, [autoFocus])
 
+  // A menu that only closes on its own button is a menu people get stuck in.
+  useEffect(() => {
+    if (!menuOpen) return
+    function onDown(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false)
+    }
+    function onKey(e) { if (e.key === 'Escape') setMenuOpen(false) }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [menuOpen])
+
   const canSend = value.trim().length > 0 && !busy
 
   function submit() {
@@ -61,121 +118,167 @@ export default function PromptInputBox({
     if (fileRef.current) fileRef.current.value = ''
   }
 
+  const items = [
+    ...(allowAttachments ? [{
+      id: 'attach', label: 'Add photos & files',
+      hint: 'Upload from computer',
+      onSelect: () => fileRef.current?.click(),
+    }] : []),
+    ...menuActions,
+  ]
+
   return (
-    <div
-      className="transition-colors"
-      style={{
-        background: CHROME.surface,
-        border: `1px solid ${focused ? CHROME.primary : CHROME.border}`,
-      }}
-    >
+    <div className="w-full">
+      {/* Attachment chips sit above the field, as they do in the reference -
+          inside it they push the caret around while you are typing. */}
       {files.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 px-3 pt-3">
+        <div className="flex flex-wrap gap-1.5 mb-2">
           {files.map((f, i) => (
-            <span
-              key={`${f.name}-${i}`}
-              className="flex items-center gap-1.5 text-[11px] px-2 py-1"
-              style={{ background: CHROME.surfaceRaised, color: CHROME.inkSecondary }}
-            >
+            <span key={`${f.name}-${i}`}
+              className="flex items-center gap-1.5 text-[11px] px-2.5 py-1"
+              style={{ background: CHROME.surfaceRaised, color: CHROME.inkSecondary,
+                       borderRadius: '14px' }}>
               <span className="font-mono truncate max-w-[180px]">{f.name}</span>
-              <button
-                onClick={() => setFiles((prev) => prev.filter((_, j) => j !== i))}
-                aria-label={`Remove ${f.name}`}
-                style={{ color: CHROME.inkMuted }}
-              >
-                ×
-              </button>
+              <button onClick={() => setFiles((p) => p.filter((_, j) => j !== i))}
+                aria-label={`Remove ${f.name}`} style={{ color: CHROME.inkMuted }}>×</button>
             </span>
           ))}
         </div>
       )}
 
-      <textarea
-        ref={textareaRef}
-        value={value}
-        rows={1}
-        placeholder={placeholder}
-        onChange={(e) => setValue(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit() }
-        }}
-        className="w-full resize-none bg-transparent px-3.5 py-3 text-sm focus:outline-none"
-        style={{ color: CHROME.ink }}
-      />
-
-      <div className="flex items-center gap-2 px-3 pb-2.5 flex-wrap">
-        {allowAttachments && (
-          <>
-            <input
-              ref={fileRef}
-              type="file"
-              multiple
-              className="hidden"
-              onChange={(e) => setFiles((prev) => [...prev, ...Array.from(e.target.files || [])])}
-            />
-            <button
-              onClick={() => fileRef.current?.click()}
-              title="Attach a file"
-              className="px-2 py-1 text-[11px]"
-              style={{ border: `1px solid ${CHROME.border}`, color: CHROME.inkMuted }}
-            >
-              Attach
-            </button>
-          </>
+      <div className="relative" ref={menuRef}>
+        {menuOpen && items.length > 0 && (
+          <div
+            role="menu"
+            className="absolute bottom-full left-0 mb-2 py-1.5 z-20 min-w-[280px]"
+            style={{
+              background: CHROME.surface,
+              border: `1px solid ${CHROME.border}`,
+              borderRadius: '16px',
+              boxShadow: '0 8px 30px rgba(43, 33, 24, 0.14)',
+            }}
+          >
+            {items.map((item) => (
+              <button
+                key={item.id}
+                role="menuitem"
+                disabled={item.disabled}
+                onClick={() => { setMenuOpen(false); item.onSelect?.() }}
+                className="w-full flex items-baseline gap-2.5 px-4 py-2 text-left transition-colors disabled:opacity-40"
+                style={{ color: CHROME.ink }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = CHROME.surfaceRaised }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+              >
+                <span className="text-[13px] font-medium whitespace-nowrap">{item.label}</span>
+                {item.hint && (
+                  <span className="text-[11px]" style={{ color: CHROME.inkDim }}>{item.hint}</span>
+                )}
+              </button>
+            ))}
+          </div>
         )}
 
-        {modes.map((m) => {
-          const active = m.value === activeMode
-          return (
+        <div
+          className="flex items-end gap-2 pl-2 pr-2 py-2 transition-colors"
+          style={{
+            background: CHROME.surface,
+            border: `1px solid ${focused ? CHROME.borderStrong : CHROME.border}`,
+            borderRadius: RADIUS,
+            boxShadow: focused ? '0 2px 14px rgba(43, 33, 24, 0.08)' : 'none',
+          }}
+        >
+          {items.length > 0 && (
             <button
-              key={m.value}
-              onClick={() => onModeChange?.(m.value)}
-              title={m.hint}
-              className="px-2 py-1 text-[11px] transition-colors"
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-label="More actions"
+              aria-expanded={menuOpen}
+              className="shrink-0 flex items-center justify-center transition-colors"
               style={{
-                background: active ? CHROME.primary : 'transparent',
-                color: active ? CHROME.primaryInk : CHROME.inkMuted,
-                border: `1px solid ${active ? CHROME.primary : CHROME.border}`,
+                width: 34, height: 34, borderRadius: '50%',
+                color: CHROME.inkSecondary,
+                background: menuOpen ? CHROME.surfaceActive : 'transparent',
               }}
             >
-              {m.label}
+              <PlusIcon />
             </button>
-          )
-        })}
+          )}
 
-        <span className="ml-auto flex items-center gap-2">
-          <span className="text-[10px] hidden sm:inline" style={{ color: CHROME.inkDim }}>
-            Enter to send · Shift+Enter for a new line
-          </span>
-          {/* While a question is in flight the primary action is to stop
-              waiting for it, not to send another - so the button becomes Stop
-              rather than sitting there disabled saying "Thinking…". On a local
-              model an answer can take tens of seconds, which is a long time to
-              offer someone no way out. */}
+          <input ref={fileRef} type="file" multiple className="hidden"
+            onChange={(e) => setFiles((p) => [...p, ...Array.from(e.target.files || [])])} />
+
+          <textarea
+            ref={textareaRef}
+            value={value}
+            rows={1}
+            placeholder={placeholder}
+            onChange={(e) => setValue(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit() }
+            }}
+            className="flex-1 min-w-0 resize-none bg-transparent py-1.5 text-[14.5px] focus:outline-none"
+            style={{ color: CHROME.ink, lineHeight: 1.5 }}
+          />
+
+          {extraControls}
+
           {busy && onStop ? (
             <button
               onClick={onStop}
-              className="px-3.5 py-1.5 text-xs font-medium"
-              style={{ background: CHROME.surfaceActive, color: CHROME.inkSecondary,
-                       border: `1px solid ${CHROME.borderStrong}` }}
+              aria-label="Stop"
               title="Stop waiting for this answer. The model keeps generating, so it may still appear later."
+              className="shrink-0 flex items-center justify-center"
+              style={{ width: 34, height: 34, borderRadius: '50%',
+                       background: CHROME.ink, color: CHROME.surface }}
             >
-              ■ Stop
+              <StopIcon />
             </button>
           ) : (
             <button
               onClick={submit}
               disabled={!canSend}
-              className="px-3.5 py-1.5 text-xs font-medium disabled:opacity-40"
-              style={{ background: CHROME.primary, color: CHROME.primaryInk }}
+              aria-label="Send"
+              className="shrink-0 flex items-center justify-center transition-opacity disabled:opacity-25"
+              style={{ width: 34, height: 34, borderRadius: '50%',
+                       background: CHROME.primary, color: CHROME.primaryInk }}
             >
-              {busy ? 'Thinking…' : 'Send'}
+              <SendIcon />
             </button>
           )}
-        </span>
+        </div>
       </div>
+
+      {/* Modes stay below and small. They change how the question is answered,
+          which is a setting rather than an action, and putting them in the
+          field would crowd the one thing people came here to do. */}
+      {(modes.length > 0) && (
+        <div className="flex items-center gap-1.5 mt-2 px-1 flex-wrap">
+          {modes.map((m) => {
+            const active = m.value === activeMode
+            return (
+              <button
+                key={m.value}
+                onClick={() => onModeChange?.(m.value)}
+                title={m.hint}
+                className="px-2.5 py-1 text-[11px] transition-colors"
+                style={{
+                  borderRadius: '13px',
+                  background: active ? CHROME.surfaceActive : 'transparent',
+                  color: active ? CHROME.primaryDeep : CHROME.inkMuted,
+                  border: `1px solid ${active ? CHROME.borderStrong : 'transparent'}`,
+                  fontWeight: active ? 600 : 400,
+                }}
+              >
+                {m.label}
+              </button>
+            )
+          })}
+          <span className="ml-auto text-[10px] hidden sm:inline" style={{ color: CHROME.inkDim }}>
+            Enter to send · Shift+Enter for a new line
+          </span>
+        </div>
+      )}
     </div>
   )
 }

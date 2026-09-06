@@ -34,7 +34,12 @@ function pickAudioType() {
   return AUDIO_TYPES.find((t) => MediaRecorder.isTypeSupported?.(t.mime)) || null
 }
 
-export default function MediaControls({ capabilities, onTranscript, onImageAnswer, disabled }) {
+/* `onActions` hands the composer a description of what this component can
+ * do - label, hint, handler, disabled - so the actions can appear as entries
+ * in the `+` menu while every piece of logic (MediaRecorder lifecycle,
+ * transcription, vision upload) stays here. Lifting that logic into the
+ * composer would have duplicated the fiddliest code in the app. */
+export default function MediaControls({ capabilities, onTranscript, onImageAnswer, disabled, onActions }) {
   const [recording, setRecording] = useState(false)
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
@@ -49,6 +54,7 @@ export default function MediaControls({ capabilities, onTranscript, onImageAnswe
   const chunksRef = useRef([])
   const stopTimerRef = useRef(null)
   const fileRef = useRef(null)
+  const actionsRef = useRef(null)
 
   const sttOn = capabilities?.stt?.available
   const visionOn = capabilities?.vision?.available
@@ -138,7 +144,53 @@ export default function MediaControls({ capabilities, onTranscript, onImageAnswe
     }
   }
 
+  // Publish the actions upward so the composer's + menu can render them,
+  // then render nothing visible ourselves. The recording state still lives
+  // here, which is why the hidden file input below is still mounted - the
+  // menu entry only triggers a click on it.
+  useEffect(() => {
+    if (!onActions) return
+    const actions = []
+    if (sttOn) {
+      actions.push({
+        id: 'stt',
+        label: recording ? 'Stop recording' : 'Dictate a question',
+        hint: recording ? `auto-stops at ${MAX_SECONDS}s`
+              : (busy === 'stt' ? 'Transcribing…' : 'Speak instead of typing'),
+        disabled: disabled || busy === 'stt',
+        onSelect: recording ? stopRecording : startRecording,
+      })
+    }
+    if (visionOn) {
+      actions.push({
+        id: 'vision',
+        label: 'Add a screenshot',
+        hint: busy === 'vision' ? 'Reading…' : 'Ask about an image of a log',
+        disabled: disabled || busy === 'vision',
+        onSelect: () => fileRef.current?.click(),
+      })
+    }
+    onActions(actions)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sttOn, visionOn, recording, busy, disabled])
+
   if (!sttOn && !visionOn) return null
+
+  // When the composer is hosting the actions, this component contributes only
+  // the hidden input and the error line - the buttons would duplicate the menu.
+  if (onActions) {
+    return (
+      <>
+        <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} className="hidden" />
+        {(recording || error) && (
+          <div className="text-[11px] mb-2 px-1" style={{ color: recording ? STATUS.danger : STATUS.danger }}>
+            {recording ? `● Recording — choose "Stop recording" from the + menu` : error}
+          </div>
+        )}
+      </>
+    )
+  }
+
 
   const btn = {
     border: `1px solid ${GLASS.borderOuter}`,

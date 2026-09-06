@@ -257,6 +257,9 @@ We built **Parser Lab** to demonstrate the parser, and then tested it against ve
 
 ## 🏗️ Architecture
 
+> A standalone two-page version, with the ledger, synthesis and
+> deployment detail, is in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
+
 ```mermaid
 flowchart TB
     subgraph Inputs

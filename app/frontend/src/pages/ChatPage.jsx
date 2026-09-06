@@ -50,6 +50,8 @@ export default function ChatPage({ pendingSessionId, pendingQuestion, onConsumeP
   // must not re-render, and the handler needs whatever the CURRENT request
   // is, not whatever it was when the handler was created.
   const abortRef = useRef(null)
+  // Published by MediaControls so the composer's + menu can offer them.
+  const [mediaActions, setMediaActions] = useState([])
   const [loadingList, setLoadingList] = useState(true)
   const bottomRef = useRef(null)
 
@@ -371,6 +373,7 @@ export default function ChatPage({ pendingSessionId, pendingQuestion, onConsumeP
               disabled={pending}
               onTranscript={setDictated}
               onImageAnswer={addImageAnswer}
+              onActions={setMediaActions}
             />
             <PromptInputBox
               prefill={dictated}
@@ -378,10 +381,11 @@ export default function ChatPage({ pendingSessionId, pendingQuestion, onConsumeP
               busy={pending}
               onStop={stop}
               allowAttachments={false}
+              menuActions={mediaActions}
               modes={CHAT_MODES}
               activeMode={mode}
               onModeChange={setMode}
-              placeholder={session?.log_id ? 'Ask about this log…' : 'Ask about the log graph…'}
+              placeholder={session?.log_id ? 'Ask about this log…' : 'Ask anything about your logs…'}
             />
           </div>
         </footer>
