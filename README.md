@@ -1,3 +1,5 @@
+<a id="top"></a>
+
 # Universal Log Pre-processing Framework (ULPF)
 
 <div align="center">
@@ -34,7 +36,52 @@ flowchart LR
 
 ---
 
+## 🧭 Index
+
+- [📸 Screenshots](#screenshots)
+  - [🧪 Parser Lab](#parser-lab)
+  - [💬 Chat](#chat)
+  - [📈 Analytics](#analytics)
+- [🎯 The Problem](#the-problem)
+- [✨ What Is Actually Built](#what-is-actually-built)
+- [🚀 Quick Start](#quick-start)
+  - [The Parser Alone — No Installation](#the-parser-alone-no-installation)
+  - [The Whole System](#the-whole-system)
+  - [Air-Gapped Deployment](#air-gapped-deployment)
+- [🧭 For Evaluators — A Guided Tour](#for-evaluators-a-guided-tour)
+  - [The Claims, and Where Each Is Enforced](#the-claims-and-where-each-is-enforced)
+  - [The Part We're Most Pleased With](#the-part-we-re-most-pleased-with)
+  - [Where the Interesting Code Lives](#where-the-interesting-code-lives)
+- [🏗️ Architecture](#architecture)
+  - [Design Principles](#design-principles)
+- [📋 The Schema](#the-schema)
+  - [Traceability Fields](#traceability-fields)
+- [🔗 The Tamper-Evident Ledger](#the-tamper-evident-ledger)
+  - [Attack Resistance](#attack-resistance)
+  - [Design Decisions Worth Defending](#design-decisions-worth-defending)
+- [🧬 Parser Synthesis](#parser-synthesis)
+  - [Performance](#performance)
+  - [How It Works](#how-it-works)
+- [🔌 Integrations](#integrations)
+  - [Pull — Streaming Exports](#pull-streaming-exports)
+  - [Push — `analytics_pipeline/forwarder.py`](#push-analytics-pipeline-forwarder-py)
+  - [OCSF Scope (Stated Honestly)](#ocsf-scope-stated-honestly)
+- [🤖 Local AI](#local-ai)
+- [📊 Measured Numbers](#measured-numbers)
+  - [Parsing Scales with CPU Cores](#parsing-scales-with-cpu-cores)
+  - [Storage Overhead (10,000 records)](#storage-overhead-10-000-records)
+  - [Air-Gap Verification](#air-gap-verification)
+- [📁 Repository Map](#repository-map)
+- [🎯 Honest Scope](#honest-scope)
+- [📜 Licences](#licences)
+- [📚 Standards Implemented](#standards-implemented)
+
+---
+<a id="screenshots"></a>
+
 ## 📸 Screenshots
+
+<a id="parser-lab"></a>
 
 ### 🧪 Parser Lab
 *Paste a log from any vendor and watch it parse live. Raw on the left, the
@@ -45,6 +92,8 @@ and nothing is stored, so it is safe to run against production.*
 
 ---
 
+<a id="chat"></a>
+
 ### 💬 Chat
 *Ask the graph in English. Text-to-Cypher shows the query it generated, charts
 are drawn on demand, and speech in/out runs locally.*
@@ -52,6 +101,8 @@ are drawn on demand, and speech in/out runs locally.*
 <img src="docs/screenshots/chat.png" alt="Chat" width="100%"/>
 
 ---
+
+<a id="analytics"></a>
 
 ### 📈 Analytics
 *Volume, severity, hosts and anomalies — with date-range, severity, source and
@@ -67,6 +118,8 @@ free-text filters threaded through every aggregation.*
 
 ---
 
+<a id="the-problem"></a>
+
 ## 🎯 The Problem
 
 Every firewall, server, cloud service and security tool writes logs in its own **private language**. Before anyone can search them, correlate them, or spot an attack, an engineer has to hand-write a translator for each one — and that work is repeated at every organisation.
@@ -74,6 +127,8 @@ Every firewall, server, cloud service and security tool writes logs in its own *
 **Worse:** once logs are normalised, most pipelines can prove what they *stored*, not that storage was never changed. In a forensic or compliance review, the second one is what counts.
 
 ---
+
+<a id="what-is-actually-built"></a>
 
 ## ✨ What Is Actually Built
 
@@ -89,7 +144,11 @@ Every firewall, server, cloud service and security tool writes logs in its own *
 
 ---
 
+<a id="quick-start"></a>
+
 ## 🚀 Quick Start
+
+<a id="the-parser-alone-no-installation"></a>
 
 ### The Parser Alone — No Installation
 
@@ -99,6 +158,8 @@ python -m batch.test_custom_formats      # 50 checks
 python -m batch.test_source_coverage     # 61 + 84 checks
 python -m batch.test_unseen_vendors      # 28 vendors absent from fixtures
 ```
+
+<a id="the-whole-system"></a>
 
 ### The Whole System
 
@@ -127,6 +188,8 @@ cd ../chatbot_pipeline   && python -m uvicorn api:app --port 8000
 cd ../../frontend && npm install && npm run dev                # → localhost:5173
 ```
 
+<a id="air-gapped-deployment"></a>
+
 ### Air-Gapped Deployment
 
 ```bash
@@ -141,7 +204,11 @@ app/build_images.ps1
 
 ---
 
+<a id="for-evaluators-a-guided-tour"></a>
+
 ## 🧭 For Evaluators — A Guided Tour
+
+<a id="the-claims-and-where-each-is-enforced"></a>
 
 ### The Claims, and Where Each Is Enforced
 
@@ -157,6 +224,8 @@ app/build_images.ps1
 
 > All tests live in [`app/backend/ingestion_pipeline/batch/test_source_coverage.py`](app/backend/ingestion_pipeline/batch/test_source_coverage.py) — readable in one sitting.
 
+<a id="the-part-we-re-most-pleased-with"></a>
+
 ### The Part We're Most Pleased With
 
 We built **Parser Lab** to demonstrate the parser, and then tested it against vendors it had never seen. Between them they found **five real bugs in our own work**:
@@ -166,6 +235,8 @@ We built **Parser Lab** to demonstrate the parser, and then tested it against ve
 3. **Raw was not verbatim** — `parse()` stored the *stripped* form, losing trailing whitespace
 4. **A broad new detector silently stole another's lines** — adding `logfmt` took FortiGate traffic logs
 5. **Our own fixtures were flattering us** — re-testing with **28 unseen vendors** dropped coverage from 97% to 75%
+
+<a id="where-the-interesting-code-lives"></a>
 
 ### Where the Interesting Code Lives
 
@@ -182,12 +253,14 @@ We built **Parser Lab** to demonstrate the parser, and then tested it against ve
 
 ---
 
+<a id="architecture"></a>
+
 ## 🏗️ Architecture
 
 ```mermaid
 flowchart TB
     subgraph Inputs
-        dnif[DNIF API] --> producer[Producer]
+        collector[Log Collector API] --> producer[Producer]
         files[Log Files] --> reassemble[Reassemble]
     end
     
@@ -226,6 +299,8 @@ flowchart TB
     chatbot --> frontend
 ```
 
+<a id="design-principles"></a>
+
 ### Design Principles
 
 - **Three independent services** — ingestion *writes*, analytics and chat *read*
@@ -235,9 +310,13 @@ flowchart TB
 
 ---
 
+<a id="the-schema"></a>
+
 ## 📋 The Schema
 
 **28 fields, 18 required**, each carrying its ECS name and OCSF path.
+
+<a id="traceability-fields"></a>
 
 ### Traceability Fields
 
@@ -255,6 +334,8 @@ flowchart TB
 > `raw_hash` matters because it is verifiable *without us* — an investigator holding the original log file can recompute SHA-256 and find the matching stored event.
 
 ---
+
+<a id="the-tamper-evident-ledger"></a>
 
 ## 🔗 The Tamper-Evident Ledger
 
@@ -274,6 +355,8 @@ python -m ledger.demo                    # seal real logs, edit, watch it caught
 python ledger/tests/test_ledger.py       # 165 adversarial checks
 ```
 
+<a id="attack-resistance"></a>
+
 ### Attack Resistance
 
 | Attack | Result |
@@ -284,6 +367,8 @@ python ledger/tests/test_ledger.py       # 165 adversarial checks
 | **Re-seal the block to hide edit** | ❌ Caught — breaks link to next block |
 | Re-seal the **entire** chain | ⚠️ **Not caught internally** — caught only by externally held head hash |
 | Forge an inclusion proof | ❌ Rejected |
+
+<a id="design-decisions-worth-defending"></a>
 
 ### Design Decisions Worth Defending
 
@@ -296,11 +381,15 @@ python ledger/tests/test_ledger.py       # 165 adversarial checks
 
 ---
 
+<a id="parser-synthesis"></a>
+
 ## 🧬 Parser Synthesis
 
 ```bash
 python -m batch.synth_parser --file unknown.log --name acme --only-unmatched
 ```
+
+<a id="performance"></a>
 
 ### Performance
 
@@ -309,6 +398,8 @@ python -m batch.synth_parser --file unknown.log --name acme --only-unmatched
 | Before | 4/4 lines unclaimed by every registered detector |
 | Synthesis | **3 ms**, confidence 0.67, **no TODO in output** |
 | After | 4/4 parsed with **zero human edits** |
+
+<a id="how-it-works"></a>
 
 ### How It Works
 
@@ -320,11 +411,17 @@ python -m batch.synth_parser --file unknown.log --name acme --only-unmatched
 
 ---
 
+<a id="integrations"></a>
+
 ## 🔌 Integrations
+
+<a id="pull-streaming-exports"></a>
 
 ### Pull — Streaming Exports
 
 NDJSON · ECS · **OCSF 1.3.0** · CEF · CSV
+
+<a id="push-analytics-pipeline-forwarder-py"></a>
 
 ### Push — `analytics_pipeline/forwarder.py`
 
@@ -336,6 +433,8 @@ NDJSON · ECS · **OCSF 1.3.0** · CEF · CSV
 
 > **Bounded queue, exponential backoff, dead-letter counter.** Delivery is **at-least-once** — deduplicate on the stable event `id`.
 
+<a id="ocsf-scope-stated-honestly"></a>
+
 ### OCSF Scope (Stated Honestly)
 
 - **Three classes implemented:** Authentication (3002), Network Activity (4001), Application Lifecycle (1008)
@@ -344,6 +443,8 @@ NDJSON · ECS · **OCSF 1.3.0** · CEF · CSV
 - On perimeter data: 74 / 16 / 11 split
 
 ---
+
+<a id="local-ai"></a>
 
 ## 🤖 Local AI
 
@@ -363,6 +464,8 @@ Everything runs on the air-gapped box. **No cloud APIs.**
 
 ---
 
+<a id="measured-numbers"></a>
+
 ## 📊 Measured Numbers
 
 **Intel i5-12450H, 8 cores / 12 threads, no GPU, Python 3.11**
@@ -379,12 +482,16 @@ Everything runs on the air-gapped box. **No cloud APIs.**
 | **9 hashes** | inclusion proof | 500-event block |
 | **25% → 10%** | speech-to-text WER | after vocabulary seeding |
 
+<a id="parsing-scales-with-cpu-cores"></a>
+
 ### Parsing Scales with CPU Cores
 
 | Workers | 1 | 2 | 4 | 8 |
 |---|---|---|---|---|
 | records/sec | 2,887 | 6,517 | 11,605 | **16,826** |
 | speedup | 1.00× | 2.26× | 4.02× | 5.83× |
+
+<a id="storage-overhead-10-000-records"></a>
 
 ### Storage Overhead (10,000 records)
 
@@ -393,6 +500,8 @@ Everything runs on the air-gapped box. **No cloud APIs.**
 | raw only | 3.09 MB | 1.00× |
 | normalised, raw included | 14.33 MB | **4.64×** |
 | + 1024-dim embedding | 53.39 MB | 17.27× |
+
+<a id="air-gap-verification"></a>
 
 ### Air-Gap Verification
 
@@ -409,6 +518,8 @@ detectors: 61
 ```
 
 ---
+
+<a id="repository-map"></a>
 
 ## 📁 Repository Map
 
@@ -438,6 +549,8 @@ app/
 
 ---
 
+<a id="honest-scope"></a>
+
 ## 🎯 Honest Scope
 
 - **Tamper-evident, not tamper-proof.** A full chain rewrite is self-consistent; caught only by a head hash published outside the system.
@@ -445,7 +558,7 @@ app/
 - **Neo4j is the wrong store beyond single-VM scale.** Streaming exports are the scale path.
 - **Semantic search runs at ~3 events/sec on CPU** and is optional per deployment.
 - **The synthesiser drafts; a human still reviews.** It gets shape and most field meanings right; it does not know your business.
-- **Never run against the real Kafka cluster or a live DNIF instance.** Both clients exist; neither has talked to production.
+- **The live path has never run against production infrastructure.** The Kafka and collector clients exist and are wired; every measurement here came through the file-ingest path.
 - **No enrichment** — no GeoIP, no threat intel, no asset lookup.
 - **Our corpus is VMware/Kubernetes infrastructure, not perimeter traffic.** Given a real firewall feed, that's the number we'd most like to re-measure.
 - **No violin or box plots** in chat charts — query results are aggregates, so distribution plots would invent spread the data doesn't contain.
@@ -453,6 +566,8 @@ app/
 We would rather state the boundary than be found at it.
 
 ---
+
+<a id="licences"></a>
 
 ## 📜 Licences
 
@@ -468,6 +583,8 @@ We would rather state the boundary than be found at it.
 
 ---
 
+<a id="standards-implemented"></a>
+
 ## 📚 Standards Implemented
 
 RFC 3164 · RFC 5424 (syslog) · RFC 6587 (octet framing) · RFC 4180 (CSV) · **RFC 6962** (Certificate Transparency) · RFC 2606 (documentation domains) · ArcSight CEF · IBM QRadar LEEF 2.0 · Elastic Common Schema 8.11 · OCSF 1.3.0
@@ -482,6 +599,6 @@ RFC 3164 · RFC 5424 (syslog) · RFC 6587 (octet framing) · RFC 4180 (CSV) · *
 
 **Built with ❤️ for Smart India Hackathon 2026**
 
-[⬆ Back to Top](#universal-log-pre-processing-framework-ulpf)
+[⬆ Back to Top](#top)
 
 </div>
