@@ -11,36 +11,7 @@ Three independent services over one graph, plus a React frontend. They are
 separate deployables on purpose: **ingestion writes, analytics and chat read,
 and the integrity ledger audits storage from a process that did not write it.**
 
-```
- SOURCES                    PIPELINE                        CONSUMERS
-
- Collector API ─┐      ┌──────────────────┐          ┌────────────────────┐
-                ├─► Kafka │ raw-logs │ ───┤          │ analytics  :8010   │
- Log files ─────┘      └──────────────────┘          │  aggregations      │
-        │                       │                    │  exports  ────────►│ SIEM
-        │                       ▼                    │  forwarder ───────►│ data lake
-        │              ┌─────────────────┐           │  Merkle ledger     │
-        └────────────► │ reassemble()    │           └────────────────────┘
-                       │ lines → records │                     ▲
-                       └────────┬────────┘                     │
-                                ▼                              │
-                    ┌───────────────────────┐            ┌─────┴──────────────┐
-                    │ LogParser.parse()     │            │ Neo4j              │
-                    │  61 detectors,        │──────────► │ 46 labels          │
-                    │  first match wins     │            │ 62 relationships   │
-                    │  └ generic_fallback   │            │ VECTOR INDEX 1024d │
-                    └───────────┬───────────┘            └─────┬──────────────┘
-                                ▼                              │
-                    ┌───────────────────────┐            ┌─────┴──────────────┐
-                    │ _enrich()             │            │ chatbot    :8000   │
-                    │  severity · entities  │            │  text-to-Cypher    │
-                    │  id · raw + raw_hash  │            │  GraphRAG          │
-                    └───────────┬───────────┘            │  speech · vision   │
-                                ▼                        └────────────────────┘
-                       bge-m3 embedding                            ▲
-                          (optional)                               │
-                                                        React frontend :5173
-```
+![ULPF architecture](screenshots/architecture_daigram.png)
 
 ### Why raw is buffered *before* parsing
 

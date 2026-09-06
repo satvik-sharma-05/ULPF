@@ -155,6 +155,10 @@ export default function MediaControls({ capabilities, onTranscript, onImageAnswe
       actions.push({
         id: 'stt',
         active: recording,
+        // Distinct from `active`: recording is the microphone being open,
+        // transcribing is the wait afterwards. On CPU that wait is seconds,
+        // and a button that just greys out for seconds reads as broken.
+        transcribing: busy === 'stt',
         label: recording ? 'Stop recording' : 'Dictate a question',
         hint: recording ? `Stop and transcribe — auto-stops at ${MAX_SECONDS}s`
               : (busy === 'stt' ? 'Transcribing…' : 'Dictate a question'),

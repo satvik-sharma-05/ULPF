@@ -1,0 +1,20 @@
+# core.autocrlf=true on this machine, and git guessed the architecture PDF was
+# text - which would have rewritten LF to CRLF inside it on checkout and handed
+# every cloner a corrupt file. Binary assets are marked explicitly rather than
+# left to heuristics.
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.tar   binary
+*.gz    binary
+*.zip   binary
+*.db    binary
+
+# Shell scripts must keep LF or they will not run inside the Docker images.
+*.sh    text eol=lf
+Dockerfile text eol=lf

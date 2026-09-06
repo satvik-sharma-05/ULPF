@@ -45,6 +45,17 @@ function MicIcon() {
   )
 }
 
+function SpinnerIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+      style={{ animation: 'ulpf-spin 0.9s linear infinite' }}>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" opacity="0.25" />
+      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.5"
+        strokeLinecap="round" />
+    </svg>
+  )
+}
+
 function SendIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -150,8 +161,10 @@ export default function PromptInputBox({
           0%   { transform: scale(1);    opacity: 0.9; }
           100% { transform: scale(1.75); opacity: 0;   }
         }
+        @keyframes ulpf-spin { to { transform: rotate(360deg); } }
         @media (prefers-reduced-motion: reduce) {
           @keyframes ulpf-pulse { 0%, 100% { transform: none; opacity: 0.9; } }
+          @keyframes ulpf-spin  { 0%, 100% { transform: none; } }
         }
       `}</style>
       {/* Attachment chips sit above the field, as they do in the reference -
@@ -255,7 +268,7 @@ export default function PromptInputBox({
               aria-label={micAction.active ? 'Stop recording' : 'Dictate a question'}
               aria-pressed={micAction.active}
               title={micAction.hint}
-              className="shrink-0 flex items-center justify-center transition-colors disabled:opacity-30"
+              className="shrink-0 flex items-center justify-center transition-colors"
               style={{
                 // relative, or the pulse ring below anchors to the composer
                 // wrapper instead of to this button.
@@ -265,9 +278,11 @@ export default function PromptInputBox({
                 // holding the microphone open - so it is filled, not outlined.
                 background: micAction.active ? '#E03131' : 'transparent',
                 color: micAction.active ? '#FFFFFF' : CHROME.inkSecondary,
+                opacity: micAction.disabled && !micAction.transcribing ? 0.3 : 1,
+                cursor: micAction.disabled ? 'default' : 'pointer',
               }}
             >
-              <MicIcon />
+              {micAction.transcribing ? <SpinnerIcon /> : <MicIcon />}
               {micAction.active && (
                 <span
                   aria-hidden="true"
@@ -279,6 +294,13 @@ export default function PromptInputBox({
                 />
               )}
             </button>
+          )}
+
+          {micAction?.transcribing && (
+            <span className="shrink-0 text-[11px] whitespace-nowrap self-center"
+              style={{ color: CHROME.inkMuted }} role="status" aria-live="polite">
+              Transcribing…
+            </span>
           )}
 
           {busy && onStop ? (

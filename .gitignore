@@ -63,3 +63,7 @@ test_*_results.json
 .idea/
 .DS_Store
 Thumbs.db
+
+# SQLite runtime sidecars - session state, not source
+chat_sessions.db-shm
+chat_sessions.db-wal

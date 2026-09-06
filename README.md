@@ -72,6 +72,7 @@ flowchart LR
   - [Storage Overhead (10,000 records)](#storage-overhead-10-000-records)
   - [Air-Gap Verification](#air-gap-verification)
 - [📁 Repository Map](#repository-map)
+- [🎯 Applications of ULPF](#applications)
 - [🎯 Honest Scope](#honest-scope)
 - [📜 Licences](#licences)
 - [📚 Standards Implemented](#standards-implemented)
@@ -257,50 +258,18 @@ We built **Parser Lab** to demonstrate the parser, and then tested it against ve
 
 ## 🏗️ Architecture
 
-> A standalone two-page version, with the ledger, synthesis and
-> deployment detail, is in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
+> A standalone two-page version, with the ledger, synthesis and deployment
+> detail, is in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — also
+> available as **[a 2-page PDF](docs/ULPF_Architecture.pdf)**.
 
-```mermaid
-flowchart TB
-    subgraph Inputs
-        collector[Log Collector API] --> producer[Producer]
-        files[Log Files] --> reassemble[Reassemble]
-    end
-    
-    producer --> kafka[Kafka<br/>raw-logs, unparsed]
-    reassemble --> kafka
-    
-    kafka --> consumer[Consumer]
-    consumer --> parser[LogParser.parse]
-    
-    subgraph Parser
-        parser --> detectors[61 Detectors]
-        parser --> fallback[Generic Fallback]
-    end
-    
-    parser --> enrich[_enrich:<br/>severity, entities,<br/>id, raw+hash]
-    enrich --> embed[bge-m3 embedding<br/>optional]
-    
-    embed --> neo4j[Neo4j]
-    
-    neo4j --> analytics[Analytics :8010]
-    neo4j --> chatbot[Chatbot :8000]
-    
-    subgraph Services
-        analytics --> aggregates[Aggregates]
-        analytics --> exports[Exports]
-        analytics --> forwarder[Forwarder]
-        analytics --> ledger[Merkle Ledger]
-        
-        chatbot --> text2cypher[Text-to-Cypher]
-        chatbot --> graphrag[GraphRAG]
-        chatbot --> speech[Speech]
-        chatbot --> vision[Vision]
-    end
-    
-    analytics --> frontend[React Frontend :5173]
-    chatbot --> frontend
-```
+<img src="docs/screenshots/architecture_daigram.png" alt="ULPF architecture" width="100%"/>
+
+**Raw is buffered before parsing.** Kafka holds *unparsed* events, so the parse
+stage can crash, restart, or scale to several replicas without losing a log
+that was already fetched. The batch path has no Kafka — raw lives in the source
+file — and if parsing fails there, the record still lands with
+`matched_format: generic_fallback` and its raw intact. **Nothing is dropped in
+either path.**
 
 <a id="design-principles"></a>
 
@@ -549,6 +518,26 @@ app/
 ```
 
 > **Not in this repository, deliberately:** the 33 GB development corpus (real captured logs, not ours to publish) and the deployment's internal addresses.
+
+---
+
+<a id="applications"></a>
+
+## 🎯 Applications of ULPF
+
+<img src="docs/screenshots/applications_of_ULPF.png" alt="Applications of ULPF" width="100%"/>
+
+| Where | What ULPF gives it |
+|---|---|
+| **Security Operations Centre** | One query language across every device, instead of one dialect per vendor. Correlation works because the fields mean the same thing whatever emitted them |
+| **Incident response** | The exact original log line behind any alert, retrieved by event id — evidence, not a summary |
+| **Digital forensics** | `raw_hash` is recomputable from the original file with no access to this system, and the Merkle ledger shows whether stored evidence was altered after collection |
+| **Compliance & audit** | Prove that what is stored is what the device emitted, byte for byte, and that nobody has changed it since |
+| **Threat hunting** | Semantic search over 1024-dim embeddings finds events that *mean* the same thing, not only those that share a keyword |
+| **SIEM migration** | Normalise once, export to NDJSON, ECS, OCSF, CEF or CSV — the parsing work does not have to be redone for the next platform |
+| **Data lake / ML pipelines** | A stable, documented schema is what makes log data trainable; free-text log lines are not |
+| **Air-gapped estates** | Defence, government and critical national infrastructure, where nothing may leave the network — speech, vision, reasoning and document generation all run locally |
+| **Onboarding a new vendor** | A source is usable on the day it arrives, and a draft parser is written for it in milliseconds |
 
 ---
 
