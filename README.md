@@ -15,76 +15,59 @@
 
 > **Turns a log from *any* device into one common schema — without losing a byte of the original, and with a hash chain that proves it was never altered afterwards.**
 
-```mermaid
-flowchart LR
-    firewall[🛡️ Firewall Syslog] --> parser
-    okta[🔐 Okta JSON] --> parser
-    windows[🖥️ Windows XML] --> parser
-    cef[📋 CEF/LEEF] --> parser
-    containerd[🐳 containerd] --> parser
-    
-    parser[⚙️ 61 Parsers] --> schema[📊 28-Field Schema]
-    parser --> raw[📦 Raw Bytes + SHA-256]
-    
-    schema --> neo4j[🗄️ Neo4j]
-    schema --> merkle[🔗 Merkle Ledger]
-    
-    neo4j --> search[🔍 Search]
-    neo4j --> export[📤 Export]
-    neo4j --> alert[🚨 Alert]
-```
+<img src="docs/screenshots/architecture_daigram.png" alt="ULPF architecture" width="100%"/>
 
 ---
 
-## 🧭 Index
+## Index
 
-- [📸 Screenshots](#screenshots)
-  - [🧪 Parser Lab](#parser-lab)
-  - [💬 Chat](#chat)
-  - [📈 Analytics](#analytics)
-- [🎯 The Problem](#the-problem)
-- [✨ What Is Actually Built](#what-is-actually-built)
-- [🚀 Quick Start](#quick-start)
+- [Screenshots](#screenshots)
+  - [Parser Lab](#parser-lab)
+  - [Chat](#chat)
+  - [Analytics](#analytics)
+- [The Problem](#the-problem)
+- [What Is Actually Built](#what-is-actually-built)
+- [Quick Start](#quick-start)
   - [The Parser Alone — No Installation](#the-parser-alone-no-installation)
   - [The Whole System](#the-whole-system)
   - [Air-Gapped Deployment](#air-gapped-deployment)
-- [🧭 For Evaluators — A Guided Tour](#for-evaluators-a-guided-tour)
+- [For Evaluators — A Guided Tour](#for-evaluators-a-guided-tour)
   - [The Claims, and Where Each Is Enforced](#the-claims-and-where-each-is-enforced)
   - [The Part We're Most Pleased With](#the-part-we-re-most-pleased-with)
   - [Where the Interesting Code Lives](#where-the-interesting-code-lives)
-- [🏗️ Architecture](#architecture)
+- [Architecture](#architecture)
   - [Design Principles](#design-principles)
-- [📋 The Schema](#the-schema)
+- [The Schema](#the-schema)
   - [Traceability Fields](#traceability-fields)
-- [🔗 The Tamper-Evident Ledger](#the-tamper-evident-ledger)
+- [The Tamper-Evident Ledger](#the-tamper-evident-ledger)
   - [Attack Resistance](#attack-resistance)
   - [Design Decisions Worth Defending](#design-decisions-worth-defending)
-- [🧬 Parser Synthesis](#parser-synthesis)
+- [Parser Synthesis](#parser-synthesis)
   - [Performance](#performance)
   - [How It Works](#how-it-works)
-- [🔌 Integrations](#integrations)
+- [Integrations](#integrations)
   - [Pull — Streaming Exports](#pull-streaming-exports)
   - [Push — `analytics_pipeline/forwarder.py`](#push-analytics-pipeline-forwarder-py)
   - [OCSF Scope (Stated Honestly)](#ocsf-scope-stated-honestly)
-- [🤖 Local AI](#local-ai)
-- [📊 Measured Numbers](#measured-numbers)
+- [Local AI](#local-ai)
+- [Measured Numbers](#measured-numbers)
   - [Parsing Scales with CPU Cores](#parsing-scales-with-cpu-cores)
   - [Storage Overhead (10,000 records)](#storage-overhead-10-000-records)
   - [Air-Gap Verification](#air-gap-verification)
-- [📁 Repository Map](#repository-map)
-- [🎯 Applications of ULPF](#applications)
-- [🎯 Honest Scope](#honest-scope)
-- [📜 Licences](#licences)
-- [📚 Standards Implemented](#standards-implemented)
+- [Repository Map](#repository-map)
+- [Applications of ULPF](#applications)
+- [Honest Scope](#honest-scope)
+- [Licences](#licences)
+- [Standards Implemented](#standards-implemented)
 
 ---
 <a id="screenshots"></a>
 
-## 📸 Screenshots
+## Screenshots
 
 <a id="parser-lab"></a>
 
-### 🧪 Parser Lab
+### Parser Lab
 *Paste a log from any vendor and watch it parse live. Raw on the left, the
 normalised record on the right, with a byte-for-byte **preserved** check —
 and nothing is stored, so it is safe to run against production.*
@@ -95,7 +78,7 @@ and nothing is stored, so it is safe to run against production.*
 
 <a id="chat"></a>
 
-### 💬 Chat
+### Chat
 *Ask the graph in English. Text-to-Cypher shows the query it generated, charts
 are drawn on demand, and speech in/out runs locally.*
 
@@ -105,7 +88,7 @@ are drawn on demand, and speech in/out runs locally.*
 
 <a id="analytics"></a>
 
-### 📈 Analytics
+### Analytics
 *Volume, severity, hosts and anomalies — with date-range, severity, source and
 free-text filters threaded through every aggregation.*
 
@@ -121,7 +104,7 @@ free-text filters threaded through every aggregation.*
 
 <a id="the-problem"></a>
 
-## 🎯 The Problem
+## The Problem
 
 Every firewall, server, cloud service and security tool writes logs in its own **private language**. Before anyone can search them, correlate them, or spot an attack, an engineer has to hand-write a translator for each one — and that work is repeated at every organisation.
 
@@ -131,7 +114,7 @@ Every firewall, server, cloud service and security tool writes logs in its own *
 
 <a id="what-is-actually-built"></a>
 
-## ✨ What Is Actually Built
+## What Is Actually Built
 
 | | |
 |---|---|
@@ -147,7 +130,7 @@ Every firewall, server, cloud service and security tool writes logs in its own *
 
 <a id="quick-start"></a>
 
-## 🚀 Quick Start
+## Quick Start
 
 <a id="the-parser-alone-no-installation"></a>
 
@@ -201,13 +184,13 @@ app/build_images.ps1
 ./load_images.sh && docker compose up -d
 ```
 
-> ✅ **No runtime downloads, telemetry, or licence checks.**
+> **No runtime downloads, telemetry, or licence checks.**
 
 ---
 
 <a id="for-evaluators-a-guided-tour"></a>
 
-## 🧭 For Evaluators — A Guided Tour
+## For Evaluators — A Guided Tour
 
 <a id="the-claims-and-where-each-is-enforced"></a>
 
@@ -256,13 +239,30 @@ We built **Parser Lab** to demonstrate the parser, and then tested it against ve
 
 <a id="architecture"></a>
 
-## 🏗️ Architecture
+## Architecture
 
 > A standalone two-page version, with the ledger, synthesis and deployment
 > detail, is in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — also
 > available as **[a 2-page PDF](docs/ULPF_Architecture.pdf)**.
 
-<img src="docs/screenshots/architecture_daigram.png" alt="ULPF architecture" width="100%"/>
+```mermaid
+flowchart LR
+    firewall[Firewall Syslog] --> parser
+    okta[Okta JSON] --> parser
+    windows[Windows XML] --> parser
+    cef[CEF/LEEF] --> parser
+    containerd[containerd] --> parser
+
+    parser[61 Parsers] --> schema[28-Field Schema]
+    parser --> raw[Raw Bytes + SHA-256]
+
+    schema --> neo4j[Neo4j]
+    schema --> merkle[Merkle Ledger]
+
+    neo4j --> search[Search]
+    neo4j --> export[Export]
+    neo4j --> alert[Alert]
+```
 
 **Raw is buffered before parsing.** Kafka holds *unparsed* events, so the parse
 stage can crash, restart, or scale to several replicas without losing a log
@@ -284,7 +284,7 @@ either path.**
 
 <a id="the-schema"></a>
 
-## 📋 The Schema
+## The Schema
 
 **28 fields, 18 required**, each carrying its ECS name and OCSF path.
 
@@ -309,7 +309,7 @@ either path.**
 
 <a id="the-tamper-evident-ledger"></a>
 
-## 🔗 The Tamper-Evident Ledger
+## The Tamper-Evident Ledger
 
 We do **not** use a blockchain. We use the primitive underneath one.
 
@@ -333,12 +333,12 @@ python ledger/tests/test_ledger.py       # 165 adversarial checks
 
 | Attack | Result |
 |---|---|
-| Edit a message | ❌ Caught — Merkle mismatch |
-| Reorder events | ❌ Caught |
-| Delete an event | ❌ Caught |
-| **Re-seal the block to hide edit** | ❌ Caught — breaks link to next block |
-| Re-seal the **entire** chain | ⚠️ **Not caught internally** — caught only by externally held head hash |
-| Forge an inclusion proof | ❌ Rejected |
+| Edit a message | Caught — Merkle mismatch |
+| Reorder events | Caught |
+| Delete an event | Caught |
+| **Re-seal the block to hide edit** | Caught — breaks link to next block |
+| Re-seal the **entire** chain | **Not caught internally** — caught only by externally held head hash |
+| Forge an inclusion proof | Rejected |
 
 <a id="design-decisions-worth-defending"></a>
 
@@ -355,7 +355,7 @@ python ledger/tests/test_ledger.py       # 165 adversarial checks
 
 <a id="parser-synthesis"></a>
 
-## 🧬 Parser Synthesis
+## Parser Synthesis
 
 ```bash
 python -m batch.synth_parser --file unknown.log --name acme --only-unmatched
@@ -385,7 +385,7 @@ python -m batch.synth_parser --file unknown.log --name acme --only-unmatched
 
 <a id="integrations"></a>
 
-## 🔌 Integrations
+## Integrations
 
 <a id="pull-streaming-exports"></a>
 
@@ -418,7 +418,7 @@ NDJSON · ECS · **OCSF 1.3.0** · CEF · CSV
 
 <a id="local-ai"></a>
 
-## 🤖 Local AI
+## Local AI
 
 Everything runs on the air-gapped box. **No cloud APIs.**
 
@@ -438,7 +438,7 @@ Everything runs on the air-gapped box. **No cloud APIs.**
 
 <a id="measured-numbers"></a>
 
-## 📊 Measured Numbers
+## Measured Numbers
 
 **Intel i5-12450H, 8 cores / 12 threads, no GPU, Python 3.11**
 
@@ -493,7 +493,7 @@ detectors: 61
 
 <a id="repository-map"></a>
 
-## 📁 Repository Map
+## Repository Map
 
 ```
 sample_logs.{txt,xml,csv}      synthetic logs covering every source category
@@ -523,7 +523,7 @@ app/
 
 <a id="applications"></a>
 
-## 🎯 Applications of ULPF
+## Applications of ULPF
 
 <img src="docs/screenshots/applications_of_ULPF.png" alt="Applications of ULPF" width="100%"/>
 
@@ -543,7 +543,7 @@ app/
 
 <a id="honest-scope"></a>
 
-## 🎯 Honest Scope
+## Honest Scope
 
 - **Tamper-evident, not tamper-proof.** A full chain rewrite is self-consistent; caught only by a head hash published outside the system.
 - **OCSF covers 3 classes of ~70.**
@@ -561,7 +561,7 @@ We would rather state the boundary than be found at it.
 
 <a id="licences"></a>
 
-## 📜 Licences
+## Licences
 
 | Licence | Projects |
 |---|---|
@@ -577,7 +577,7 @@ We would rather state the boundary than be found at it.
 
 <a id="standards-implemented"></a>
 
-## 📚 Standards Implemented
+## Standards Implemented
 
 RFC 3164 · RFC 5424 (syslog) · RFC 6587 (octet framing) · RFC 4180 (CSV) · **RFC 6962** (Certificate Transparency) · RFC 2606 (documentation domains) · ArcSight CEF · IBM QRadar LEEF 2.0 · Elastic Common Schema 8.11 · OCSF 1.3.0
 
@@ -589,8 +589,8 @@ RFC 3164 · RFC 5424 (syslog) · RFC 6587 (octet framing) · RFC 4180 (CSV) · *
 
 <div align="center">
 
-**Built with ❤️ for Smart India Hackathon 2026**
+**Built for Smart India Hackathon 2026**
 
-[⬆ Back to Top](#top)
+[Back to Top](#top)
 
 </div>

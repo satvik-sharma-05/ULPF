@@ -1,7 +1,6 @@
 # ULPF — Architecture
 
 **Universal Log Pre-processing Framework** · SIH 2026 · NTRO
-Two pages. Everything stated here is in the repository and testable.
 
 ---
 
