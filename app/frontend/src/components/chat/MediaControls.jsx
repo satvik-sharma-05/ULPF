@@ -154,9 +154,10 @@ export default function MediaControls({ capabilities, onTranscript, onImageAnswe
     if (sttOn) {
       actions.push({
         id: 'stt',
+        active: recording,
         label: recording ? 'Stop recording' : 'Dictate a question',
-        hint: recording ? `auto-stops at ${MAX_SECONDS}s`
-              : (busy === 'stt' ? 'Transcribing…' : 'Speak instead of typing'),
+        hint: recording ? `Stop and transcribe — auto-stops at ${MAX_SECONDS}s`
+              : (busy === 'stt' ? 'Transcribing…' : 'Dictate a question'),
         disabled: disabled || busy === 'stt',
         onSelect: recording ? stopRecording : startRecording,
       })
@@ -184,7 +185,7 @@ export default function MediaControls({ capabilities, onTranscript, onImageAnswe
         <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} className="hidden" />
         {(recording || error) && (
           <div className="text-[11px] mb-2 px-1" style={{ color: recording ? STATUS.danger : STATUS.danger }}>
-            {recording ? `● Recording — choose "Stop recording" from the + menu` : error}
+            {recording ? '● Recording — press the microphone again to stop' : error}
           </div>
         )}
       </>

@@ -34,6 +34,17 @@ function PlusIcon() {
   )
 }
 
+function MicIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="9" y="2.5" width="6" height="11" rx="3" fill="currentColor" />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0" stroke="currentColor" strokeWidth="2"
+        strokeLinecap="round" />
+      <path d="M12 17.5V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 function SendIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -67,6 +78,11 @@ export default function PromptInputBox({
   allowAttachments = true,
   // Entries for the `+` menu: { id, label, hint, onSelect }.
   menuActions = [],
+  /* Dictation gets its own button rather than a menu entry. It is the one
+   * media action people reach for mid-sentence, and burying a
+   * frequently-used control two clicks deep to keep the bar tidy is the
+   * wrong trade. Shape: { active, disabled, hint, onSelect }. */
+  micAction = null,
 }) {
   const [value, setValue] = useState('')
   const [files, setFiles] = useState([])
@@ -129,6 +145,15 @@ export default function PromptInputBox({
 
   return (
     <div className="w-full">
+      <style>{`
+        @keyframes ulpf-pulse {
+          0%   { transform: scale(1);    opacity: 0.9; }
+          100% { transform: scale(1.75); opacity: 0;   }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          @keyframes ulpf-pulse { 0%, 100% { transform: none; opacity: 0.9; } }
+        }
+      `}</style>
       {/* Attachment chips sit above the field, as they do in the reference -
           inside it they push the caret around while you are typing. */}
       {files.length > 0 && (
@@ -222,6 +247,39 @@ export default function PromptInputBox({
           />
 
           {extraControls}
+
+          {micAction && (
+            <button
+              onClick={micAction.onSelect}
+              disabled={micAction.disabled}
+              aria-label={micAction.active ? 'Stop recording' : 'Dictate a question'}
+              aria-pressed={micAction.active}
+              title={micAction.hint}
+              className="shrink-0 flex items-center justify-center transition-colors disabled:opacity-30"
+              style={{
+                // relative, or the pulse ring below anchors to the composer
+                // wrapper instead of to this button.
+                position: 'relative',
+                width: 34, height: 34, borderRadius: '50%',
+                // Recording is a state people must not lose track of - it is
+                // holding the microphone open - so it is filled, not outlined.
+                background: micAction.active ? '#E03131' : 'transparent',
+                color: micAction.active ? '#FFFFFF' : CHROME.inkSecondary,
+              }}
+            >
+              <MicIcon />
+              {micAction.active && (
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute', width: 34, height: 34, borderRadius: '50%',
+                    border: '2px solid #E03131', animation: 'ulpf-pulse 1.4s ease-out infinite',
+                    pointerEvents: 'none',
+                  }}
+                />
+              )}
+            </button>
+          )}
 
           {busy && onStop ? (
             <button

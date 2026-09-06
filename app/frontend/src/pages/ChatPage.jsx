@@ -381,7 +381,11 @@ export default function ChatPage({ pendingSessionId, pendingQuestion, onConsumeP
               busy={pending}
               onStop={stop}
               allowAttachments={false}
-              menuActions={mediaActions}
+              // Dictation gets its own mic button; everything else stays in
+              // the + menu. It is the one media action reached for
+              // mid-sentence, so two clicks deep would be the wrong place.
+              micAction={mediaActions.find((a) => a.id === 'stt') || null}
+              menuActions={mediaActions.filter((a) => a.id !== 'stt')}
               modes={CHAT_MODES}
               activeMode={mode}
               onModeChange={setMode}
