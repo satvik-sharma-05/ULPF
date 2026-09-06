@@ -27,16 +27,21 @@ its raw intact. **Nothing is dropped in either path.**
 ### The parsing decision
 
 ```
-record ──► looks like JSON? ──yes──► 8 JSON-aware detectors ──► structural reader
-   │
-   no
-   ▼
-61 detectors, priority order ──► first match wins
-   │
-   nothing matched
-   ▼
-generic_fallback ──► positional host (RFC 3164/5424), proc[pid], key=value,
-                     binary guard. Always returns a schema-valid record.
+record
+  │
+  ├─ looks like JSON?
+  │    yes ─► 8 JSON-aware detectors
+  │             ─► structural reader
+  ▼
+  61 detectors, priority order
+  │    first match wins
+  ▼
+  nothing matched
+  ▼
+  generic_fallback
+       positional host (RFC 3164/5424)
+       proc[pid], key=value, binary guard
+       always returns a schema-valid record
 ```
 
 **Detector order is the most fragile thing in the system.** A broad new format
@@ -90,11 +95,14 @@ Not a blockchain, and saying so would be overclaiming. The primitive underneath
 one, where it earns its place.
 
 ```
-event  ─► leaf   = SHA256(0x00 ‖ canonical(event))      RFC 6962 prefixes
-leaves ─► root   = Merkle tree, odd nodes promoted (never duplicated)
-block  ─► hash   = SHA256(header incl. prev_hash ‖ merkle_root)
-blocks ─► chain  = each block commits to the previous
-chain  ─► head   = the single value that must be protected
+event  ─► leaf  = SHA256(0x00 ‖ canonical(event))
+leaves ─► root  = Merkle tree, odd nodes
+                  promoted, never duplicated
+block  ─► hash  = SHA256(header ‖ merkle_root)
+blocks ─► chain = each block commits to the
+                  hash of the one before it
+chain  ─► head  = the single value that
+                  must be protected
 ```
 
 | Attack | Result |
@@ -124,18 +132,20 @@ place a real blockchain or an RFC 3161 timestamp authority would belong.
 ## 4. Onboarding an unseen source
 
 ```
-unknown lines ─► tokenize into typed slots ─► group by shape ─► align
-                                                                  │
-                     literals = structure, varying slots = fields ─┘
-                                        │
-                                        ▼
-              parser_semantics: what does each field MEAN?
-                position (RFC 3164/5424 fix host and program slots)
-                key name (vocabulary from the formats we already parse)
-                value shape (ipv4, timestamp, severity word)
-                                        │
-                                        ▼
-                        a runnable detector + per-field evidence
+unknown lines
+  ─► tokenize into typed slots
+  ─► group by shape, then align
+  ─► literals = structure
+     varying slots = fields
+  ▼
+parser_semantics: what does each field MEAN?
+  position     RFC 3164/5424 fix the host
+               and program slots
+  key name     vocabulary from the formats
+               we already parse
+  value shape  ipv4, timestamp, severity
+  ▼
+a runnable detector + per-field evidence
 ```
 
 Measured on a vendor absent from the codebase: **3 ms**, and the generated
