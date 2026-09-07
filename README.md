@@ -17,6 +17,12 @@
 
 <img src="docs/screenshots/architecture_daigram.png" alt="ULPF architecture" width="100%"/>
 
+<div align="center">
+
+**[▶ Watch the 2-minute demo](https://youtu.be/Dq9uF0tje_I?si=_RWs3yxBVPm7Ldvo)** &nbsp;·&nbsp; **[Architecture document (PDF)](https://drive.google.com/file/d/1cv6IT7edGPYRwudRg-UI2coSRZsapkY8/view?usp=sharing)**
+
+</div>
+
 ---
 
 ## Index
@@ -243,7 +249,8 @@ We built **Parser Lab** to demonstrate the parser, and then tested it against ve
 
 > A standalone two-page version, with the ledger, synthesis and deployment
 > detail, is in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — also
-> available as **[a 2-page PDF](docs/ULPF_Architecture.pdf)**.
+> available as **[a 2-page PDF](docs/ULPF_Architecture.pdf)** in this repo, or
+> **[hosted on Drive](https://drive.google.com/file/d/1cv6IT7edGPYRwudRg-UI2coSRZsapkY8/view?usp=sharing)**.
 
 ```mermaid
 flowchart LR
